@@ -1,0 +1,10 @@
+#!/bin/sh
+
+TOP_LEVEL=$(git rev-parse --show-toplevel)
+BUILD=${TOP_LEVEL}/build
+TEST=${BUILD}/test/core/constructor
+$(${TOP_LEVEL}/aeten-cli/aeten-cli.sh import all)
+
+for lang in c cpp; do
+	check -m "Test ${lang} constructor" test "'$(echo $(${TEST}/constructor.${lang}.o))'" = "'start main end'"
+done

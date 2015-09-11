@@ -1,0 +1,5 @@
+[submodule "aeten-cli"]
+	path = aeten-cli
+	url = https://github.com/aeten/aeten-cli.git
+	branch = master
+	sparse-checkout = aeten-cli.sh
