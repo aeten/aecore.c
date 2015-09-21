@@ -1,6 +1,7 @@
 all: test
 
-test: build/test/core/constructor/constructor.c.o build/test/core/constructor/constructor.cpp.o test/core/constructor/constructor
+test: build/api/aeten/core/algebra/base build/test/core/constructor/constructor.c.o build/test/core/constructor/constructor.cpp.o test/core/constructor/constructor
+	build/api/aeten/core/algebra/base  -i 8 -o 16 173 -v
 	@test/core/constructor/constructor
 
 clean:
@@ -22,4 +23,10 @@ build/test/core/constructor/constructor.cpp.o: test/core/constructor/constructor
 	@-mkdir --parent $$(dirname $@)
 	g++ $< -Iapi -o $@
 
+test/core/constructor/constructor:
+	echo
+
+build/api/aeten/core/algebra/base: src/aeten/core/algebra/base.c
+	@-mkdir --parent $$(dirname $@)
+	gcc -g -O0 -lm -o $@ $<
 .PHONY: all test
