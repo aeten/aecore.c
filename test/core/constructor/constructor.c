@@ -1,5 +1,8 @@
 #include "aeten/core/constructor.h"
+#define constructor(fn) aeten_core_constructor(fn)
+#define destructor(fn) aeten_core_destructor(fn)
 #include <stdio.h>
+
 
 constructor(start) {
     printf("%s\n", __func__);

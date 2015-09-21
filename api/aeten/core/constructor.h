@@ -1,30 +1,30 @@
 #include <stdlib.h>
 
 #if defined(__cplusplus)
-	struct construct { construct(void (*f)(void)) { f(); } };
-#	define constructor(fn) \
+	struct aeten_core_construct { aeten_core_construct(void (*f)(void)) { f(); } };
+#	define aeten_core_constructor(fn) \
 		static void fn(void); \
-		static construct constructor_##fn(fn); \
+		static aeten_core_construct aeten_core_constructor_##fn(fn); \
 		void fn()
 
 #else
 #	if defined(__GNUC__)
-#		define constructor(fn) \
+#		define aeten_core_constructor(fn) \
 			static void fn(void) __attribute__((constructor)); \
 			static void fn(void)
 
 #	elif defined(_MSC_VER)
-#		define constructor(fn) \
+#		define aeten_core_constructor(fn) \
 			static void __cdecl fn(void); \
 			__declspec(allocate(".CRT$XCU")) void (__cdecl *fn##_)(void) = fn; \
 			static void __cdecl fn(void)
 #	endif
 #endif
 
-#if defined(constructor) && !defined(destructor)
-#	define destructor(fn) \
+#if defined(aeten_core_constructor) && !defined(aeten_core_destructor)
+#	define aeten_core_destructor(fn) \
 		static void fn(void);\
-		constructor(destructor_##fn) { \
+		aeten_core_constructor(aeten_core_destructor_##fn) { \
 			atexit( fn ); \
 		} \
 		static void fn(void)
