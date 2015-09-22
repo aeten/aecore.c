@@ -1,7 +1,8 @@
-#include "aeten/core/constructor.h"
+#include "aeten/core.h"
+#include <stdio.h>
+
 #define constructor(fn) aeten_core_constructor(fn)
 #define destructor(fn) aeten_core_destructor(fn)
-#include <stdio.h>
 
 
 constructor(start) {

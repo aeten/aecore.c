@@ -2,9 +2,9 @@
 
 TOP_LEVEL=$(git rev-parse --show-toplevel)
 BUILD=${TOP_LEVEL}/build
-TEST=${BUILD}/test/core/constructor
+TEST=${BUILD}/test/core
 $(${TOP_LEVEL}/aeten-cli/aeten-cli.sh import all)
 
 for lang in c cpp; do
-	check -m "Test ${lang} constructor" test "'$(echo $(${TEST}/constructor.${lang}.o))'" = "'start main end'"
+	check -m "Test ${lang} object" test "'$(echo $(${TEST}/object.${lang}.o))'" = "'Table: Map ArrayList: List'"
 done

@@ -1,32 +1,50 @@
 all: test
 
-test: build/test/core/algebra/base build/test/core/constructor/constructor.c.o build/test/core/constructor/constructor.cpp.o test/core/constructor/constructor
-	@build/test/core/algebra/base  -i 8 -o 16 173 -v
-	@test/core/constructor/constructor
+test: test/core/algebra/base test/core/constructor test/core/object
+	@for procedure in $^; do ./$$procedure || exit 1; done
 
 clean:
 	rm -rf build
 
-build/api/aeten/core/constructor.h.o: api/aeten/core/constructor.h
+build/test/core/constructor.c.o: test/core/constructor.c build/api/aeten/core.h.o
 	@-mkdir --parent $$(dirname $@)
 	gcc $< -Iapi -o $@
 
-build/api/aeten/core/constructor.hpp.o: api/aeten/core/constructor.h
+build/test/core/constructor.cpp.o: test/core/constructor.c build/api/aeten/core.hh.o
 	@-mkdir --parent $$(dirname $@)
 	g++ $< -Iapi -o $@
 
-build/test/core/constructor/constructor.c.o: test/core/constructor/constructor.c build/api/aeten/core/constructor.h.o
+test/core/object: build/test/core/object.c.o build/test/core/object.cpp.o
+	@true
+
+test/core/constructor: build/test/core/constructor.c.o build/test/core/constructor.cpp.o
+	@true
+
+test/core/algebra/base: build/src/aeten/core/algebra/base.c.o build/src/aeten/core/algebra/base.cpp.o
+	@true
+
+build/api/aeten/core.h.o: api/aeten/core.h
 	@-mkdir --parent $$(dirname $@)
 	gcc $< -Iapi -o $@
 
-build/test/core/constructor/constructor.cpp.o: test/core/constructor/constructor.c build/api/aeten/core/constructor.hpp.o
+build/api/aeten/core.hh.o: api/aeten/core.h
 	@-mkdir --parent $$(dirname $@)
 	g++ $< -Iapi -o $@
 
-test/core/constructor/constructor:
-	echo
+build/test/core/object.c.o: test/core/object.c build/api/aeten/core.h.o
+	@-mkdir --parent $$(dirname $@)
+	gcc $< -Iapi -o $@
 
-build/test/core/algebra/base: src/aeten/core/algebra/base.c
+build/test/core/object.cpp.o: test/core/object.c build/api/aeten/core.hh.o
+	@-mkdir --parent $$(dirname $@)
+	g++ $< -Iapi -o $@
+
+build/src/aeten/core/algebra/base.c.o: src/aeten/core/algebra/base.c
 	@-mkdir --parent $$(dirname $@)
 	gcc -g -O0 -lm -o $@ $<
+
+build/src/aeten/core/algebra/base.cpp.o: src/aeten/core/algebra/base.c
+	@-mkdir --parent $$(dirname $@)
+	g++ -g -O0 -lm -o $@ $<
+
 .PHONY: all test

@@ -8,8 +8,8 @@
 #define AETEN_CORE__IS_VERBOSE(flags) ((flags & AETEN_CORE__VERBOSE)? 1: 0)
 
 typedef struct s_aeten_core_collections__map_entry {
-	void *key;
-	void *value;
+	const void *key;
+	const void *value;
 } aeten_core_collections__map_entry_t;
 
 //struct s_aeten_core_collections__map {
