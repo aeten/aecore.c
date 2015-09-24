@@ -29,7 +29,7 @@ typedef struct aeten_interface_s aeten_interface;
 typedef struct aeten_method_s aeten_method;
 struct aeten_interface_s {
 	char const *name;
-	aeten_method **methods;
+	aeten_method *methods;
 	aeten_interface **parents;
 };
 struct aeten_method_s {
@@ -41,16 +41,16 @@ struct aeten_method_s {
 #define _aeten_core__define_type(iface, iface_name, ...) \
 	static aeten_interface iface; \
 	aeten_core_constructor(_##iface_name##_c) { \
-		aeten_interface *ifc_list[] = {__VA_ARGS__};\
 		int i; \
+		aeten_interface *ifc_list[] = {__VA_ARGS__}; \
 		size_t size = sizeof(ifc_list)/sizeof(aeten_interface*); \
 		iface.name = #iface_name; \
-		iface.parents = (aeten_interface**) malloc(size+1* sizeof(aeten_interface**)); \
+		iface.parents = (aeten_interface**) malloc((size+1) * sizeof(aeten_interface*)); \
 		for (i=0; i < size; ++i) { \
 			iface.parents[i] = ifc_list[i]; \
 		} \
 		iface.parents[size] = NULL; \
-		iface.methods = (aeten_method**) calloc(1, sizeof(aeten_method**)); \
+		iface.methods = (aeten_method*) calloc(1, sizeof(aeten_method[1])); \
 	} \
 	aeten_core_destructor(_##iface_name##_d) { \
 		free(iface.parents); \
@@ -76,21 +76,22 @@ struct aeten_method_s {
 	memset(instance, 0, sizeof(implementation)); \
 	instance->interface = & _##implementation##_i; \
 
-#define method(iface, type, nm, ...) \
-	typedef type (*iface##__##nm##_t)(__VA_ARGS__); \
-	static aeten_method iface##__##nm = (aeten_method) { \
-		&iface, \
-		#nm, \
-		NULL \
-	}; \
+#define method(iface, typ, nm, ...) \
+	typedef typ (*iface##__##nm##_t)(__VA_ARGS__); \
 	aeten_core_constructor(_##iface##__##nm##_c) { \
-		int size; \
-		for (size=0; iface.methods[size]; ++size) {} \
-		iface.methods = (aeten_method**) realloc(iface.methods, (++size+1)*(sizeof(aeten_method*))); \
-		iface.methods[size-1] = &iface##__##nm; \
-		iface.methods[size] = NULL; \
+		int size, i; \
+		for (size=0; iface.methods[size].name; ++size) {} \
+		aeten_method *methods = (aeten_method*) calloc(++size+1, sizeof(aeten_method[size+1])); \
+		for (i=0; i<size-1; ++i) { \
+			memcpy(&methods[i], &iface.methods[i], sizeof(aeten_method)); \
+		} \
+		\
+		free(iface.methods); \
+		methods[size-1].interface = &iface; \
+		methods[size-1].name = #nm; \
+		methods[size-1].type = NULL; \
+		iface.methods = methods; \
 	}
-
 
 interface(Enum)
 method(Enum, int, value)

@@ -45,8 +45,8 @@ Table * Table__new() {
 void print_methods(aeten_interface *interface) {
 	int i;
 	printf(" (");
-	for (i=0; interface->methods[i]; ++i) {
-		printf("%s%s", ((i==0)? "": ", "), interface->methods[i]->name);
+	for (i=0; interface->methods[i].name; ++i) {
+		printf("%s%s", ((i==0)? "": ", "), interface->methods[i].name);
 	}
 	printf(") ");
 }
