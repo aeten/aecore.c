@@ -1,8 +1,11 @@
 #include "aeten/core.h"
 #include <stdio.h>
 
-interface(List);
-impl(ArrayList, List) {
+interface(List)
+method(List, size_t, size)
+method(List, int, foo)
+
+impl(ArrayList, &List) {
 	_aeten_core__object__impl
 	size_t size;
 	void *array;
@@ -22,8 +25,10 @@ ArrayList * ArrayList__new(size_t nmemb, size_t size) {
 	return ArrayList__init(list, (void*)(list+sizeof(ArrayList)), nmemb);
 }
 
-interface(Map);
-impl(Table, Map) {
+interface(Map)
+method(Map, size_t, size)
+
+impl(Table, &Map) {
 	_aeten_core__object__impl
 	size_t size;
 };
@@ -36,24 +41,35 @@ Table * Table__new() {
 	return Table__init(map);
 }
 
-void print_parents(aeten_core_interface *interface) {
+
+void print_methods(aeten_interface *interface) {
 	int i;
-	aeten_core_interface *parent = interface->parent;
-	for (i=0; parent->name; ++parent, ++i) {
-		printf("%s%s", (i==0 || parent->parent->name)? "": ", ", parent->name);
-		print_parents(parent);
+	printf(" (");
+	for (i=0; interface->methods[i]; ++i) {
+		printf("%s%s", ((i==0)? "": ", "), interface->methods[i]->name);
+	}
+	printf(") ");
+}
+void print_parents(aeten_interface *interface) {
+	int i;
+	print_methods(interface);
+	for (i=0; interface->parents[i]; ++i) {
+		printf("%s%s", ((i==0)? "": ", "), interface->parents[i]->name);
+		print_parents(interface->parents[i]);
 	}
 }
 
 int main(int argc, char **argv) {
 	Table map;
 	Table__init(&map);
-	printf("%s: ", map.interface.name);
-	print_parents(&map.interface);
-	printf("\n");
 	ArrayList list = *ArrayList__new(10, sizeof(int));
-	printf("%s: ", list.interface.name);
-	print_parents(&list.interface);
+
+	printf("%s:", map.interface->name);
+	print_parents(map.interface);
+	printf("\n");
+
+	printf("%s:", list.interface->name);
+	print_parents(list.interface);
 	printf("\n");
 	return 0;
 }
