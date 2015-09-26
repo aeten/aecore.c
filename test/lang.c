@@ -2,8 +2,8 @@
 #include <stdio.h>
 
 aeten_lang__interface(List)
-aeten_lang__method(List, size_t, size)
-aeten_lang__method(List, int, foo)
+aeten_lang__method(List, size, size_t)
+aeten_lang__method(List, foo, void, int, char, void*)
 
 aeten_lang__implementation(ArrayList, &List) {
 	_aeten_lang__object__impl
@@ -26,7 +26,7 @@ ArrayList * ArrayList__new(size_t nmemb, size_t size) {
 }
 
 aeten_lang__interface(Map)
-aeten_lang__method(Map, size_t, size)
+aeten_lang__method(Map, size, size_t)
 
 aeten_lang__implementation(Table, &Map) {
 	_aeten_lang__object__impl
@@ -43,10 +43,15 @@ Table * Table__new() {
 
 
 void print_methods(aeten_lang__interface *interface) {
-	int i;
+	int i, a;
 	printf(" (");
 	for (i=0; interface->methods[i].name; ++i) {
-		printf("%s%s", ((i==0)? "": ", "), interface->methods[i].name);
+		printf("%s%s (", ((i==0)? "": ", "), interface->methods[i].name);
+		//for (a=0; interface->methods[i].args_type && interface->methods[i].args_type[a].name; ++a) {
+		for (a=1; interface->methods[i].signature[a].name; ++a) {
+			printf("%s%s(%u)", ((a==0)? "": ", "), interface->methods[i].signature[a].name, interface->methods[i].signature[a].size);
+		}
+		printf("): %s", interface->methods[i].signature[0].name);
 	}
 	printf(") ");
 }

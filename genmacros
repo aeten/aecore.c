@@ -1,0 +1,42 @@
+#!/bin/sh
+STD=C99
+ARGC_MAX_C99='127'
+ARGC_MAX=$(eval echo \${ARGC_MAX_${STD}})
+
+GENERATED=generated
+MACROS=api/aeten/macros.h
+mkdir -p $(dirname ${GENERATED}/${MACROS})
+
+cat - << EOF > generated/api/aeten/macros.h
+#ifndef AETEN_MACROS
+#define AETEN_MACROS
+
+#define AETEN_STRINGIZE(arg)  _1_AETEN_STRINGIZE(arg)
+#define _1_AETEN_STRINGIZE(arg) _2_AETEN_STRINGIZE(arg)
+#define _2_AETEN_STRINGIZE(arg) #arg
+
+#define AETEN_CONCATENATE(arg1, arg2)   _1_AETEN_CONCATENATE(arg1, arg2)
+#define _1_AETEN_CONCATENATE(arg1, arg2)  _2_AETEN_CONCATENATE(arg1, arg2)
+#define _2_AETEN_CONCATENATE(arg1, arg2)  arg1##arg2
+
+//#define _0_AETEN_FOR_EACH(what, x, ...)
+//#define _1_AETEN_FOR_EACH(what, x, ...) DO_PRAGMA(GCC warning x #__VA_ARGS__) what(x)
+#define _1_AETEN_FOR_EACH(what, x, ...) what(x)
+$(for i in $(seq 2 ${ARGC_MAX}); do echo '#define _'${i}'_AETEN_FOR_EACH(what, x, ...) what(x) _'$((${i}-1))'_AETEN_FOR_EACH(what, __VA_ARGS__)'; done)
+
+#define AETEN_FOR_EACH_NARG(...) _AETEN_FOR_EACH_NARG(__VA_ARGS__, _AETEN_FOR_EACH_RSEQ_N())
+#define _AETEN_FOR_EACH_NARG(...) _AETEN_FOR_EACH_ARG_N(__VA_ARGS__) 
+#define _AETEN_FOR_EACH_ARG_N(_$(seq -s,\ _ 1 ${ARGC_MAX}), N, ...) N 
+#define _AETEN_FOR_EACH_RSEQ_N() $(seq -s,\  ${ARGC_MAX} -1 1)
+ 
+#define _AETEN_FOR_EACH(N, what, ...) AETEN_CONCATENATE(_, AETEN_CONCATENATE(N, _AETEN_FOR_EACH))(what, __VA_ARGS__)
+#define AETEN_FOR_EACH(what, ...) _AETEN_FOR_EACH(AETEN_FOR_EACH_NARG(__VA_ARGS__), what, __VA_ARGS__)
+
+#define _AETEN_SIZE_OF_EACH(t) sizeof(t),
+#define AETEN_SIZE_OF_EACH(...) { AETEN_FOR_EACH(_AETEN_SIZE_OF_EACH, ## __VA_ARGS__) (size_t)NULL }
+
+#define _AETEN_STRING_OF_EACH(arg) #arg,
+#define AETEN_STRING_OF_EACH(...) { AETEN_FOR_EACH(_AETEN_STRING_OF_EACH, ## __VA_ARGS__) (char*)NULL }
+
+#endif
+EOF

@@ -1,5 +1,7 @@
+GENERATED=generated
 CC=gcc
-CCFLAGS=-g -O0
+CCFLAGS=-g -O0 -DAETEN_DEBUG
+
 all: test
 
 test: test/core/algebra/base test/lang
@@ -14,13 +16,13 @@ test/lang: build/test/lang.o
 test/core/algebra/base: build/src/aeten/core/algebra/base.c.o build/src/aeten/core/algebra/base.cpp.o
 	@true
 
-build/api/aeten/lang.h.o: api/aeten/lang.h
+build/api/aeten/lang.h.o: api/aeten/lang.h ${GENERATED}/api/aeten/macros.h
 	@-mkdir --parent $$(dirname $@)
-	${CC} ${CCFLAGS} $< -Iapi -o $@
+	${CC} ${CCFLAGS} $< -Iapi -I${GENERATED}/api -o $@
 
 build/test/lang.o: test/lang.c build/api/aeten/lang.h.o
 	@-mkdir --parent $$(dirname $@)
-	${CC} ${CCFLAGS} $< -Iapi -o $@
+	${CC} ${CCFLAGS} $< -Iapi -I${GENERATED}/api -o $@
 
 build/src/aeten/core/algebra/base.c.o: src/aeten/core/algebra/base.c
 	@-mkdir --parent $$(dirname $@)
@@ -29,5 +31,8 @@ build/src/aeten/core/algebra/base.c.o: src/aeten/core/algebra/base.c
 build/src/aeten/core/algebra/base.cpp.o: src/aeten/core/algebra/base.c
 	@-mkdir --parent $$(dirname $@)
 	g++ -g -O0 -lm -o $@ $<
+
+${GENERATED}/api/aeten/macros.h:
+	./genmacros
 
 .PHONY: all test
