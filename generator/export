@@ -1,0 +1,25 @@
+#!/bin/sh
+
+GENERATED=generated
+PACKAGE=aeten/lang
+INPUT_FILE=api/${PACKAGE}.h
+EXPORT=${GENERATED}/api/${PACKAGE}/export.h
+IMPORT=${GENERATED}/api/${PACKAGE}/import.h
+mkdir -p ${GENERATED}/api/${PACKAGE}
+PACKAGE=$(echo ${PACKAGE}|tr / _)
+
+cat - << EOF > ${EXPORT}
+#ifndef _${PACKAGE}_EXPORT_H
+#	define _${PACKAGE}_EXPORT_H
+#	ifdef AETEN_IMPORT
+$(sed -n 's@^#\s*define\s\+'${PACKAGE}'__\([^(^[:space:]]\+\).*@#\t\tdefine \1 '${PACKAGE}'__\1@p' ${INPUT_FILE}|sort -u)
+#	endif
+#endif
+EOF
+
+cat - << EOF > ${IMPORT}
+#define AETEN_IMPORT
+#  include "aeten/lang.h"
+#undef AETEN_IMPORT
+EOF
+

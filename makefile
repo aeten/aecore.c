@@ -8,7 +8,7 @@ test: test/core/algebra/base test/lang
 	@for procedure in $^; do ./$$procedure || exit 1; done
 
 clean:
-	rm -rf build
+	rm -rf build ${GENERATED}
 
 test/lang: build/test/lang.o
 	@true
@@ -16,7 +16,7 @@ test/lang: build/test/lang.o
 test/core/algebra/base: build/src/aeten/core/algebra/base.c.o build/src/aeten/core/algebra/base.cpp.o
 	@true
 
-build/api/aeten/lang.h.o: api/aeten/lang.h ${GENERATED}/api/aeten/macros.h
+build/api/aeten/lang.h.o: api/aeten/lang.h ${GENERATED}/api/aeten/lang/export.h ${GENERATED}/api/aeten/lang/for-each-macro.h
 	@-mkdir --parent $$(dirname $@)
 	${CC} ${CCFLAGS} $< -Iapi -I${GENERATED}/api -o $@
 
@@ -32,7 +32,10 @@ build/src/aeten/core/algebra/base.cpp.o: src/aeten/core/algebra/base.c
 	@-mkdir --parent $$(dirname $@)
 	g++ -g -O0 -lm -o $@ $<
 
-${GENERATED}/api/aeten/macros.h:
-	./genmacros
+${GENERATED}/api/aeten/lang/export.h:
+	./generator/export
+
+${GENERATED}/api/aeten/lang/for-each-macro.h:
+	./generator/for-each-macro
 
 .PHONY: all test

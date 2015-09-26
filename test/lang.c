@@ -1,9 +1,9 @@
-#include "aeten/lang.h"
+#include "aeten/lang/import.h"
 #include <stdio.h>
 
-aeten_lang__interface(List)
-aeten_lang__method(List, size, size_t)
-aeten_lang__method(List, foo, void, int, char, void*)
+interface(List);
+method(List, size, size_t);
+method(List, foo, void, int, char, void*);
 
 aeten_lang__implementation(ArrayList, &List) {
 	_aeten_lang__object__impl
@@ -42,7 +42,7 @@ Table * Table__new() {
 }
 
 
-void print_methods(aeten_lang__interface *interface) {
+void print_methods(aeten_lang__interface_t *interface) {
 	int i, a;
 	printf(" (");
 	for (i=0; interface->methods[i].name; ++i) {
@@ -55,7 +55,7 @@ void print_methods(aeten_lang__interface *interface) {
 	}
 	printf(") ");
 }
-void print_parents(aeten_lang__interface *interface) {
+void print_parents(aeten_lang__interface_t *interface) {
 	int i;
 	print_methods(interface);
 	for (i=0; interface->parents[i]; ++i) {

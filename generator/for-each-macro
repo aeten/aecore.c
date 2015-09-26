@@ -4,10 +4,10 @@ ARGC_MAX_C99='127'
 ARGC_MAX=$(eval echo \${ARGC_MAX_${STD}})
 
 GENERATED=generated
-MACROS=api/aeten/macros.h
-mkdir -p $(dirname ${GENERATED}/${MACROS})
+MACRO=api/aeten/lang/FOR_EACH.h
+mkdir -p $(dirname ${GENERATED}/${MACRO})
 
-cat - << EOF > generated/api/aeten/macros.h
+cat - << EOF > ${GENERATED}/${MACRO}
 #ifndef AETEN_MACROS
 #define AETEN_MACROS
 
