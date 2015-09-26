@@ -120,6 +120,14 @@ struct aeten_lang__method_implementation_s {
 		_aeten_lang__method_construct(&iface, #nm, signature_types, signature_sizes); \
 	}
 
+#define aeten_lang__new(iface, ...) \
+	iface##__new(__VA_ARGS__)
+
+#define aeten_lang__init(iface, ...) \
+	iface AETEN_FIRST_ARG(__VA_ARGS__); \
+	iface##__init(&__VA_ARGS__);
+
+
 static void _aeten_lang__construct(aeten_lang__interface_t *iface, char const *iface_name, aeten_lang__interface_t *ifc_list[]) {
 	int i;
 	size_t size = sizeof(ifc_list)/sizeof(aeten_lang__interface_t*);

@@ -38,5 +38,7 @@ $(for i in $(seq 2 ${ARGC_MAX}); do echo '#define _'${i}'_AETEN_FOR_EACH(what, x
 #define _AETEN_STRING_OF_EACH(arg) #arg,
 #define AETEN_STRING_OF_EACH(...) { AETEN_FOR_EACH(_AETEN_STRING_OF_EACH, ## __VA_ARGS__) (char*)NULL }
 
+#define AETEN_FIRST_ARG(first, ...) first
+#define AETEN_NOT_FIRST_ARG(first, ...) __VA_ARGS__
 #endif
 EOF

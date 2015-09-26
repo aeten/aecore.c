@@ -65,9 +65,8 @@ void print_parents(aeten_lang__interface_t *interface) {
 }
 
 int main(int argc, char **argv) {
-	Table map;
-	Table__init(&map);
-	ArrayList list = *ArrayList__new(10, sizeof(int));
+	init(Table, map);
+	ArrayList list = *new(ArrayList, 10, sizeof(int));
 
 	printf("%s:", map.interface->name);
 	print_parents(map.interface);

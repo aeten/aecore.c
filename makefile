@@ -38,4 +38,4 @@ ${GENERATED}/api/aeten/lang/export.h:
 ${GENERATED}/api/aeten/lang/for-each-macro.h:
 	./generator/for-each-macro
 
-.PHONY: all test
+.PHONY: all test ${GENERATED}/api/aeten/lang/export.h ${GENERATED}/api/aeten/lang/for-each-macro.h
