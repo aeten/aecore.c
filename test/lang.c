@@ -1,18 +1,18 @@
-#include "aeten/core.h"
+#include "aeten/lang.h"
 #include <stdio.h>
 
-interface(List)
-method(List, size_t, size)
-method(List, int, foo)
+aeten_lang__interface(List)
+aeten_lang__method(List, size_t, size)
+aeten_lang__method(List, int, foo)
 
-impl(ArrayList, &List) {
-	_aeten_core__object__impl
+aeten_lang__implementation(ArrayList, &List) {
+	_aeten_lang__object__impl
 	size_t size;
 	void *array;
 };
 
 ArrayList * ArrayList__init(ArrayList *list, void *array, size_t size) {
-	_aeten_core__object__new(ArrayList, list);
+	_aeten_lang__object__new(ArrayList, list);
 	list->array = array;
 	list->size = size;
 	return list;
@@ -25,15 +25,15 @@ ArrayList * ArrayList__new(size_t nmemb, size_t size) {
 	return ArrayList__init(list, (void*)(list+sizeof(ArrayList)), nmemb);
 }
 
-interface(Map)
-method(Map, size_t, size)
+aeten_lang__interface(Map)
+aeten_lang__method(Map, size_t, size)
 
-impl(Table, &Map) {
-	_aeten_core__object__impl
+aeten_lang__implementation(Table, &Map) {
+	_aeten_lang__object__impl
 	size_t size;
 };
 Table * Table__init(Table *map) {
-	_aeten_core__object__new(Table, map);
+	_aeten_lang__object__new(Table, map);
 	return map;
 }
 Table * Table__new() {
@@ -42,7 +42,7 @@ Table * Table__new() {
 }
 
 
-void print_methods(aeten_interface *interface) {
+void print_methods(aeten_lang__interface *interface) {
 	int i;
 	printf(" (");
 	for (i=0; interface->methods[i].name; ++i) {
@@ -50,7 +50,7 @@ void print_methods(aeten_interface *interface) {
 	}
 	printf(") ");
 }
-void print_parents(aeten_interface *interface) {
+void print_parents(aeten_lang__interface *interface) {
 	int i;
 	print_methods(interface);
 	for (i=0; interface->parents[i]; ++i) {

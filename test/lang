@@ -1,0 +1,8 @@
+#!/bin/sh
+
+TOP_LEVEL=$(git rev-parse --show-toplevel)
+BUILD=${TOP_LEVEL}/build
+TEST=${BUILD}/test
+$(${TOP_LEVEL}/aeten-cli/aeten-cli.sh import all)
+
+check -m "Test lang" test "'$(echo $(${TEST}/lang.o))'" = "'Table: () Map (size) ArrayList: () List (size, foo)'"
