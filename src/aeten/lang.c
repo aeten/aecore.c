@@ -34,7 +34,7 @@ void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *n
 	int size, signature_names_size, i, j;
 	char **signature_types = _signature_types;
 	size_t *signature_sizes = _signature_sizes;
-	AETEN_DEBUG("Adds method %s.%s(%s): %s", iface->name, name, AETEN_JOIN_STRINGS(signature_types+1, ','), signature_types[0]);
+	AETEN_DEBUG("Adds method %s.%s(%s): %s", iface->name, name, AETEN_DEBUG_JOIN_STRINGS(signature_types+1, ','), signature_types[0]);
 
 	for (size=0; iface->methods[size].signature && iface->methods[size].signature->name; ++size) { }
 	for (signature_names_size=0, i=0; signature_types[i]; ++i, ++signature_names_size) {}

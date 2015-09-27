@@ -2,7 +2,7 @@ SHELL=sh
 GENERATED=generated
 BUILD=build
 CC=gcc
-CCFLAGS=-g -O0 -DAETEN_DEBUG -fPIC
+CCFLAGS=-g -O0 -fPIC
 
 NAME=$(notdir $(realpath $(dir $MAKEFILE)))
 VERSION=$(shell { git describe --tags --match='\d\+\.\d\+.*' --dirty=+ 2>/dev/null || echo g$$(git describe --always --dirty=+); } | sed 's@.*/@@')
@@ -17,7 +17,7 @@ SRC_O=$(addprefix ${BUILD}/,$(patsubst %.c,%.o,${SRC}))
 
 $(info Build ${NAME} ${VERSION})
 
-.PHONY: check all lib clean ${GEN}
+.PHONY: check all lib clean debug ${GEN}
 
 all: check lib
 
@@ -28,6 +28,9 @@ check: ${BUILD}/test/lang
 
 clean:
 	rm -rf build ${GENERATED}
+
+debug:
+	$(eval CCFLAGS=${CCFLAGS} -DAETEN_DEBUG)
 
 ${SRC_O}: ${HDR_O}
 

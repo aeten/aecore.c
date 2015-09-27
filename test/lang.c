@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
 	}
 	for (i=0; i<list->length; ++i) {
 		value = *((int*) ArrayList__get(list, i));
-		assert(value==i);
+		AETEN_DEBUG_ASSERT(value==i);
 		printf("Value of list[%d]=%d\n", i, value);
 	}
 	printf("%s:", list->interface->name);

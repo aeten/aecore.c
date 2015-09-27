@@ -54,13 +54,13 @@ void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *n
 			_aeten_debug_tmp_str = 0; \
 		} \
 	} while (0)
-#	define AETEN_JOIN_STRINGS(src, join) _aeten_lang__join_strings(_aeten_debug_tmp_str, src, join)
-#	define ASSERT(...) assert(__VA_ARGS__)
+#	define AETEN_DEBUG_JOIN_STRINGS(src, join) _aeten_lang__join_strings(_aeten_debug_tmp_str, src, join)
+#	define AETEN_DEBUG_ASSERT(...) assert(__VA_ARGS__)
 
 #else
 #	define AETEN_DEBUG(...)
-#	define AETEN_JOIN_STRINGS(dest, src)
-#	define ASSERT(...)
+#	define AETEN_DEBUG_JOIN_STRINGS(dest, src)
+#	define AETEN_DEBUG_ASSERT(...)
 #endif
 
 #if defined(__GNUC__)
