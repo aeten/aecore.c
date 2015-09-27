@@ -104,11 +104,16 @@ struct aeten_lang__method_implementation_s {
 	};
 
 #define _aeten_lang__object__impl \
-	aeten_lang__interface_t *interface;
+	aeten_lang__interface_t *interface; \
+	void * finalize;
 
-#define _aeten_lang__object__new(implementation, instance, ...) \
+//	void (*(void*))() finalize;
+
+#define _aeten_lang__object__new(implementation, instance, ...) do { \
 	memset(instance, 0, sizeof(implementation)); \
-	instance->interface = & _##implementation##_i; 
+	instance->interface = & _##implementation##_i; \
+	instance->finalize = implementation##__finalize; \
+} while (0)
 
 #define aeten_lang__method(iface, type, nm, ...) \
 	typedef type (*iface##__##nm##_t)(__VA_ARGS__); \
@@ -125,12 +130,10 @@ struct aeten_lang__method_implementation_s {
 	iface AETEN_FIRST_ARG(__VA_ARGS__); \
 	iface##__init(&__VA_ARGS__);
 
-#define _aeten_lang__define_table(type, size) \
-	typedef struct aeten_lang__table_s { \
-		size_t length; \
-		type elem[size]; \
-	}
-
+#define aeten_lang__delete(object) do { \
+	((void (*)())object->finalize)(object); \
+	free(object); \
+} while(0)
 
 static void _aeten_lang__construct(aeten_lang__interface_t *iface, char const *iface_name, aeten_lang__interface_t *ifc_list[]) {
 	int i;
@@ -161,11 +164,6 @@ static char *_aeten_lang__join_strings(char *dest, char* src[], char join) {
 	*(dest + offset-1) = 0;
 	return dest;
 }
-
-typedef struct aeten_lang__table_s {
-	size_t size;
-	void *elements;
-} aeten_lang__table_t;
 
 static void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *name, char *_signature_types[], size_t _signature_sizes[]) {
 	int size, signature_names_size, i, j;

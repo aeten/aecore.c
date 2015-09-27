@@ -3,44 +3,49 @@
 
 interface(List);
 method(List, size_t, size);
-method(List, void, foo, int, char, void*);
+//method(List, void, set, int, void);
+method(List, void*, get, int);
 
-aeten_lang__implementation(ArrayList, &List) {
+implementation(ArrayList, List) {
 	_aeten_lang__object__impl
-	size_t size;
-	void *array;
+	size_t length;
+	size_t element_size;
+	void *elements;
 };
 
-ArrayList * ArrayList__init(ArrayList *list, void *array, size_t size) {
+ArrayList * ArrayList__init(ArrayList *list, size_t element_size, size_t length);
+ArrayList * ArrayList__new(size_t element_size, size_t length);
+void ArrayList__finalize(ArrayList *list);
+void * ArrayList__get(ArrayList *list, int index);
+void ArrayList__set(ArrayList *list, int index, void *value);
+
+ArrayList * ArrayList__new(size_t element_size, size_t length) {
+	ArrayList *list = (ArrayList *) calloc(1, sizeof(ArrayList));
+	return ArrayList__init(list, element_size, length);
+}
+ArrayList * ArrayList__init(ArrayList *list, size_t element_size, size_t length) {
 	_aeten_lang__object__new(ArrayList, list);
-	list->array = array;
-	list->size = size;
+	list->elements = calloc(length, element_size);
+	list->length = length;
+	list->element_size = element_size;
 	return list;
 }
-void ArrayList__delete(ArrayList *list) {
-	free(list);
+void ArrayList__finalize(ArrayList *list) {
+	free(list->elements);
 }
-ArrayList * ArrayList__new(size_t nmemb, size_t size) {
-	ArrayList *list = (ArrayList *) calloc(1, sizeof(ArrayList) + (nmemb*size));
-	return ArrayList__init(list, (void*)(list+sizeof(ArrayList)), nmemb);
+void ArrayList__set(ArrayList *list, int index, void *value) {
+	unsigned long pointer = (unsigned long)list->elements;
+	pointer += index*list->element_size;
+	memcpy((void*)pointer, value, list->element_size);
 }
-
-interface(Map)
-method(Map, size_t, size)
-
-aeten_lang__implementation(Table, &Map) {
-	_aeten_lang__object__impl
-	size_t size;
-};
-Table * Table__init(Table *map) {
-	_aeten_lang__object__new(Table, map);
-	return map;
+void * ArrayList__get(ArrayList *list, int index) {
+	unsigned long pointer = (unsigned long)list->elements;
+	pointer += index*list->element_size;
+	return (void*) pointer;
 }
-Table * Table__new() {
-	Table *map = (Table *) calloc(1, sizeof(Table));
-	return Table__init(map);
+size_t ArrayList__size(ArrayList *list) {
+	list->length;
 }
-
 
 void print_methods(aeten_lang__interface_t *interface) {
 	int i, a;
@@ -65,15 +70,20 @@ void print_parents(aeten_lang__interface_t *interface) {
 }
 
 int main(int argc, char **argv) {
-	init(Table, map);
-	ArrayList list = *new(ArrayList, 10, sizeof(int));
-
-	printf("%s:", map.interface->name);
-	print_parents(map.interface);
+	int i, value;
+	ArrayList *list = new(ArrayList, sizeof(int), 10);
+	for (i=0; i<list->length; ++i) {
+		ArrayList__set(list, i, (void*)&i);
+	}
+	for (i=0; i<list->length; ++i) {
+		value = *((int*) ArrayList__get(list, i));
+		assert(value==i);
+		printf("Value of list[%d]=%d\n", i, value);
+	}
+	printf("%s:", list->interface->name);
+	print_parents(list->interface);
 	printf("\n");
+	delete(list);
 
-	printf("%s:", list.interface->name);
-	print_parents(list.interface);
-	printf("\n");
 	return 0;
 }
