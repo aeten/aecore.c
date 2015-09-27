@@ -1,3 +1,4 @@
+SHELL=sh
 GENERATED=generated
 CC=gcc
 CCFLAGS=-g -O0 -DAETEN_DEBUG

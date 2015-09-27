@@ -2,8 +2,8 @@
 #include <stdio.h>
 
 interface(List);
-method(List, size, size_t);
-method(List, foo, void, int, char, void*);
+method(List, size_t, size);
+method(List, void, foo, int, char, void*);
 
 aeten_lang__implementation(ArrayList, &List) {
 	_aeten_lang__object__impl
@@ -25,8 +25,8 @@ ArrayList * ArrayList__new(size_t nmemb, size_t size) {
 	return ArrayList__init(list, (void*)(list+sizeof(ArrayList)), nmemb);
 }
 
-aeten_lang__interface(Map)
-aeten_lang__method(Map, size, size_t)
+interface(Map)
+method(Map, size_t, size)
 
 aeten_lang__implementation(Table, &Map) {
 	_aeten_lang__object__impl

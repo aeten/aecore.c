@@ -35,6 +35,8 @@ struct aeten_lang__method_implementation_s {
 	void *implementation;
 };
 
+#define AETEN_COUNT_OF(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
+
 #ifdef AETEN_DEBUG
 #	include<stdio.h>
 #	include <assert.h>
@@ -81,9 +83,8 @@ struct aeten_lang__method_implementation_s {
 
 #define _aeten_lang__define_type(iface, iface_name, ...) \
 	static aeten_lang__interface_t iface; \
-	static aeten_lang__interface_t *iface##_parents[] = {__VA_ARGS__}; \
 	_aeten_lang__constructor(_##iface_name##_c) { \
-		_aeten_lang__construct(&iface, #iface_name, iface##_parents); \
+		_aeten_lang__construct(&iface, #iface_name, AETEN_REF_OF_EACH(aeten_lang__interface_t, __VA_ARGS__)); \
 	} \
 	_aeten_lang__destructor(_##iface_name##_d) { \
 		free(iface.parents); \
@@ -91,7 +92,7 @@ struct aeten_lang__method_implementation_s {
 
 #define aeten_lang__implementation(implementation, ...) \
 	typedef struct _##implementation##_ms {} _##implementation##_m; \
-	static _##implementation##_m _##implementation##_methods;\
+	static _##implementation##_m _##implementation##_methods; \
 	_aeten_lang__define_type(_##implementation##_i, implementation, __VA_ARGS__); \
 	typedef struct _##implementation##_s implementation; \
 	struct _##implementation##_s
@@ -109,14 +110,11 @@ struct aeten_lang__method_implementation_s {
 	memset(instance, 0, sizeof(implementation)); \
 	instance->interface = & _##implementation##_i; 
 
-#define _AETEN_LANG_CB_RETURN_TYPE(ret_type, ...) ret_type
-#define _AETEN_LANG_CB_ARGS_TYPE(ret_type, ...) __VA_ARGS__
-
-#define aeten_lang__method(iface, nm, ...) \
-	typedef _AETEN_LANG_CB_RETURN_TYPE(__VA_ARGS__) (*iface##__##nm##_t)(_AETEN_LANG_CB_ARGS_TYPE(__VA_ARGS__)); \
+#define aeten_lang__method(iface, type, nm, ...) \
+	typedef type (*iface##__##nm##_t)(__VA_ARGS__); \
 	_aeten_lang__constructor(_##iface##__##nm##_constr) { \
-		char * signature_types[] = AETEN_STRING_OF_EACH(__VA_ARGS__); \
-		size_t signature_sizes[] = AETEN_SIZE_OF_EACH(__VA_ARGS__); \
+		char * signature_types[] = AETEN_STRING_OF_EACH(type, __VA_ARGS__); \
+		size_t signature_sizes[] = AETEN_SIZE_OF_EACH(type, __VA_ARGS__); \
 		_aeten_lang__method_construct(&iface, #nm, signature_types, signature_sizes); \
 	}
 
@@ -126,6 +124,12 @@ struct aeten_lang__method_implementation_s {
 #define aeten_lang__init(iface, ...) \
 	iface AETEN_FIRST_ARG(__VA_ARGS__); \
 	iface##__init(&__VA_ARGS__);
+
+#define _aeten_lang__define_table(type, size) \
+	typedef struct aeten_lang__table_s { \
+		size_t length; \
+		type elem[size]; \
+	}
 
 
 static void _aeten_lang__construct(aeten_lang__interface_t *iface, char const *iface_name, aeten_lang__interface_t *ifc_list[]) {
@@ -158,18 +162,30 @@ static char *_aeten_lang__join_strings(char *dest, char* src[], char join) {
 	return dest;
 }
 
+typedef struct aeten_lang__table_s {
+	size_t size;
+	void *elements;
+} aeten_lang__table_t;
+
 static void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *name, char *_signature_types[], size_t _signature_sizes[]) {
 	int size, signature_names_size, i, j;
 	char **signature_types = _signature_types;
 	size_t *signature_sizes = _signature_sizes;
 	AETEN_DEBUG("Adds method %s.%s(%s): %s", iface->name, name, AETEN_JOIN_STRINGS(signature_types+1, ','), signature_types[0]);
-	for (size=0; iface->methods[size].signature && iface->methods[size].signature->name; ++size) {}
+
+	for (size=0; iface->methods[size].signature && iface->methods[size].signature->name; ++size) { }
 	for (signature_names_size=0, i=0; signature_types[i]; ++i, ++signature_names_size) {}
-	aeten_lang__method_definition_t *methods = (aeten_lang__method_definition_t*) calloc(++size+1, sizeof(aeten_lang__method_definition_t[size+1]) + sizeof(signature_types+1) + sizeof(signature_sizes+1) + (signature_names_size+1)*sizeof(char));
+
+/*	aeten_lang__method_definition_t *methods = (aeten_lang__method_definition_t*) calloc(1, (1 + ++size) * sizeof(aeten_lang__method_definition_t*) + size*sizeof(aeten_lang__method_definition_t));
+
+	aeten_lang__type_t signature;
 	for (i=0; i<size-1; ++i) {
 		for (j=0; iface->methods[i].signature[j].name; ++j) {
-			methods[i].signature[j].name = iface->methods[i].signature[j].name;
-			methods[i].signature[j].size = iface->methods[i].signature[j].size;
+			for (signature_names_size=0, i=0; signature_types[i]; ++i, ++signature_names_size) {}
+			signature = iface->methods[i].signature[j];
+//			calloc()
+//			methods[i].signature[j].name = iface->methods[i].signature[j].name;
+//			methods[i].signature[j].size = iface->methods[i].signature[j].size;
 		}
 		methods[i].interface = iface->methods[i].interface;
 		methods[i].name = iface->methods[i].name;
@@ -183,9 +199,11 @@ static void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char c
 		methods[i].signature[j].size = signature_sizes[j];
 	}
 	iface->methods = methods;
+*/
 }
 
-aeten_lang__interface(aeten_lang__Enum)
-aeten_lang__method(aeten_lang__Enum, value, int)
+
+aeten_lang__interface(aeten_lang__Enum);
+aeten_lang__method(aeten_lang__Enum, int, value);
 
 #endif // AETEN_CORE_H
