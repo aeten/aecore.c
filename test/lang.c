@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include "aeten/lang/import.h"
-#include "aeten/lang/ArrayList.h"
+#include "aeten/lang/CopyOnWriteArrayList.h"
 
 void print_methods(aeten_lang__interface_t *interface) {
 	int i, a;
@@ -26,12 +26,12 @@ void print_parents(aeten_lang__interface_t *interface) {
 
 int main(int argc, char **argv) {
 	int i, value;
-	ArrayList *list = new(ArrayList, sizeof(int), 10);
-	for (i=0; i<list->length; ++i) {
-		ArrayList__set(list, i, (void*)&i);
+	aeten_lang__CopyOnWriteArrayList *list = new(aeten_lang__CopyOnWriteArrayList, sizeof(int), 5);
+	for (i=0; i<10; ++i) {
+		aeten_lang__CopyOnWriteArrayList__add(list, (void*)&i);
 	}
-	for (i=0; i<list->length; ++i) {
-		value = *((int*) ArrayList__get(list, i));
+	for (i=0; i<aeten_lang__CopyOnWriteArrayList__size(list); ++i) {
+		value = *((int*) aeten_lang__CopyOnWriteArrayList__get(list, i));
 		AETEN_DEBUG_ASSERT(value==i);
 		printf("Value of list[%d]=%d\n", i, value);
 	}
