@@ -26,12 +26,12 @@ void print_parents(aeten_lang__interface_t *interface) {
 
 int main(int argc, char **argv) {
 	int i, value;
-	aeten_lang__CopyOnWriteArrayList *list = new(aeten_lang__CopyOnWriteArrayList, sizeof(int), 5);
+	aeten_lang__List *list = new(aeten_lang__CopyOnWriteArrayList, sizeof(int), 5);
 	for (i=0; i<10; ++i) {
-		aeten_lang__CopyOnWriteArrayList__add(list, (void*)&i);
+		list->add(list, (void*)&i);
 	}
-	for (i=0; i<aeten_lang__CopyOnWriteArrayList__size(list); ++i) {
-		value = *((int*) aeten_lang__CopyOnWriteArrayList__get(list, i));
+	for (i=0; i<list->size(list); ++i) {
+		value = *((int*) list->get(list, i));
 		AETEN_DEBUG_ASSERT(value==i);
 		printf("Value of list[%d]=%d\n", i, value);
 	}
