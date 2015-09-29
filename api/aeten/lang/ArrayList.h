@@ -4,16 +4,11 @@
 #include "aeten/lang/import.h"
 #include "aeten/lang/List.h"
 
-struct aeten_lang__ArrayList__private_st {
+implementation(aeten_lang__ArrayList, {
 	size_t length;
 	size_t element_size;
 	void *elements;
-};
-
-implementation(aeten_lang__ArrayList, aeten_lang__List) {
-	aeten_lang__List__header(aeten_lang__ArrayList);
-	aeten_lang__ArrayList__private_t _private;
-};
+}, aeten_lang__List) 
 
 aeten_lang__ArrayList * aeten_lang__ArrayList__initialize(aeten_lang__ArrayList *list, size_t element_size, size_t length);
 aeten_lang__List * aeten_lang__ArrayList__new(size_t element_size, size_t length);

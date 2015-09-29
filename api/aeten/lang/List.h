@@ -10,16 +10,13 @@
 	instance->add = implementation##__add; \
 } while (0);
 
-#define aeten_lang__List__header(implementation) \
-	object_header; \
-	size_t (*size)(aeten_lang__List*); \
-	void*  (*get)  (aeten_lang__List*, unsigned int); \
-	void   (*set)  (aeten_lang__List*, unsigned int, void*); \
-	void   (*add)  (aeten_lang__List*, void*);
+#define aeten_lang__List__methods(iface) \
+	size_t (*size)(iface*); \
+	void*  (*get) (iface*, unsigned int); \
+	void   (*set) (iface*, unsigned int, void*); \
+	void   (*add) (iface*, void*);
 
-interface(aeten_lang__List) {
-	aeten_lang__List__header(aeten_lang__List)
-};
+interface(aeten_lang__List);
 
 /** Returns the number of elements in this list. */
 method(aeten_lang__List, size_t, size);

@@ -113,19 +113,29 @@ void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *n
 		free(iface##_i.parents); \
 	}
 
-#define aeten_lang__implementation(implementation, ...) \
-	typedef struct implementation##__private_st implementation##__private_t; \
+#define _AETEN_LANG_EACH_IFACE_METHODS(iface) iface##__methods(iface)
+#define AETEN_LANG_EACH_IFACE_METHODS(x, ...) AETEN_FOR_EACH(_AETEN_LANG_EACH_IFACE_METHODS, x, __VA_ARGS__)
+
+#define aeten_lang__implementation(implementation, prvt, ...) \
 	typedef struct _##implementation##_ms {} _##implementation##_m; \
 	static _##implementation##_m _##implementation##_methods; \
 	_aeten_lang__define_type(_##implementation, implementation, __VA_ARGS__); \
-	struct _##implementation##_st
+	typedef struct _##implementation##__private_st prvt _##implementation##__private_t; \
+	typedef struct _##implementation##_st { \
+		aeten_lang__object_header \
+		AETEN_LANG_EACH_IFACE_METHODS(__VA_ARGS__) \
+		_##implementation##__private_t _private; \
+	} _##implementation##_t; \
 
 #define aeten_lang__interface(iface, ...) \
 	_aeten_lang__define_type(iface, iface, __VA_ARGS__); \
 	_aeten_lang__destructor(_##iface##__##nm##_d) { \
 		free(iface##_i.methods); \
 	}; \
-	struct iface##_st
+	struct iface##_st { \
+		object_header; \
+		iface##__methods(iface); \
+	};
 
 #define aeten_lang__object__init(implementation, instance, ...) do { \
 	memset(instance, 0, sizeof(implementation)); \
