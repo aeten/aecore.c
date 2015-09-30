@@ -2,7 +2,7 @@ SHELL=sh
 GENERATED=generated
 BUILD=build
 CC=gcc
-CCFLAGS=-g -O0 -fPIC
+CCFLAGS=-g -O0 -fPIC #-Wall -Wextra -Wmissing-prototypes -Wstrict-prototypes -Wold-style-definition
 
 NAME=$(notdir $(realpath $(dir $MAKEFILE)))
 VERSION=$(shell { git describe --tags --match='\d\+\.\d\+.*' --dirty=+ 2>/dev/null || echo g$$(git describe --always --dirty=+); } | sed 's@.*/@@')
@@ -19,7 +19,7 @@ $(info Build ${NAME} ${VERSION})
 
 .PHONY: check all lib clean debug ${GEN}
 
-all: check lib
+all: lib
 
 lib: ${LIB}
 

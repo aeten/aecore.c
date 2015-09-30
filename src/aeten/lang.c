@@ -1,15 +1,18 @@
 #include "aeten/lang.h"
+#include "aeten/lang/CopyOnWriteArrayList.h"
 
 void _aeten_lang__construct(aeten_lang__interface_t *iface, char const *iface_name, aeten_lang__interface_t *ifc_list[]) {
-	int i;
-	size_t size = sizeof(ifc_list)/sizeof(aeten_lang__interface_t*);
+	unsigned int i;
+	size_t size;
+	for (size=0; ifc_list[size] ; ++size) { }
 	iface->name = iface_name;
-	iface->parents = (aeten_lang__interface_t**) malloc((size+1) * sizeof(aeten_lang__interface_t*));
-	for (i=0; i < size; ++i) {
-		iface->parents[i] = ifc_list[i];
+	AETEN_DEBUG("Register %s(%x) size=%u", iface->name, iface, size);
+	iface->parents = (aeten_lang__ParentsList*)aeten_lang__new(aeten_lang__CopyOnWriteArrayList, sizeof(aeten_lang__interface_t), size);
+	for (i=0; i < size && ifc_list[i]; ++i) {
+		AETEN_DEBUG("\t%s(%x) innerits from %s(%x)", iface->name, iface, ifc_list[i]->name, ifc_list[i]);
+		aeten_lang__cast_and_call(iface->parents, aeten_lang__List, add, ifc_list[i]);
 	}
-	iface->parents[size] = NULL;
-	iface->methods = (aeten_lang__method_definition_t*) calloc(1, sizeof(aeten_lang__method_definition_t[1]));
+	iface->methods = (aeten_lang__MethodsList*)aeten_lang__new(aeten_lang__CopyOnWriteArrayList, sizeof(aeten_lang__method_definition_t), 2);
 }
 
 char *_aeten_lang__join_strings(char *dest, char* src[], char join) {
@@ -30,37 +33,20 @@ char *_aeten_lang__join_strings(char *dest, char* src[], char join) {
 	return dest;
 }
 
-void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *name, char *_signature_types[], size_t _signature_sizes[]) {
-	int size, signature_names_size, i, j;
-	char **signature_types = _signature_types;
-	size_t *signature_sizes = _signature_sizes;
-	AETEN_DEBUG("Adds method %s.%s(%s): %s", iface->name, name, AETEN_DEBUG_JOIN_STRINGS(signature_types+1, ','), signature_types[0]);
+void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *name, char *signature_types[], size_t signature_sizes[]) {
+	unsigned int i;
+	size_t size;
+    for (size=0; signature_types[size]; ++size) {}
+	AETEN_DEBUG("Adds method %s.%s(%s): %s", iface->name, name, AETEN_DEBUG_JOIN_STRINGS(signature_types+1, ','), *signature_types, size);
 
-	for (size=0; iface->methods[size].signature && iface->methods[size].signature->name; ++size) { }
-	for (signature_names_size=0, i=0; signature_types[i]; ++i, ++signature_names_size) {}
-
-/*	aeten_lang__method_definition_t *methods = (aeten_lang__method_definition_t*) calloc(1, (1 + ++size) * sizeof(aeten_lang__method_definition_t*) + size*sizeof(aeten_lang__method_definition_t));
-
-	aeten_lang__type_t signature;
-	for (i=0; i<size-1; ++i) {
-		for (j=0; iface->methods[i].signature[j].name; ++j) {
-			for (signature_names_size=0, i=0; signature_types[i]; ++i, ++signature_names_size) {}
-			signature = iface->methods[i].signature[j];
-//			calloc()
-//			methods[i].signature[j].name = iface->methods[i].signature[j].name;
-//			methods[i].signature[j].size = iface->methods[i].signature[j].size;
-		}
-		methods[i].interface = iface->methods[i].interface;
-		methods[i].name = iface->methods[i].name;
+	aeten_lang__method_definition_t method = {
+		iface,
+		name,
+		(aeten_lang__Signature*) aeten_lang__new(aeten_lang__CopyOnWriteArrayList, sizeof(aeten_lang__type_t), size)
+	};
+	for (i=0; i<size; i++) {
+		aeten_lang__type_t type = { signature_types[i], signature_sizes[i] };
+		aeten_lang__cast_and_call(method.signature, aeten_lang__List, add, (void*)&type);
 	}
-
-	free(iface->methods);
-	methods[i].interface = iface;
-	methods[i].name = name;
-	for (j=0; signature_types[j]; j++) {
-		methods[i].signature[j].name = signature_types[j];
-		methods[i].signature[j].size = signature_sizes[j];
-	}
-	iface->methods = methods;
-*/
+	aeten_lang__cast_and_call(iface->methods, aeten_lang__List, add, (void*)&method);
 }

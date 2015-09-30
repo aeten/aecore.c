@@ -1,3 +1,10 @@
 build/
 dist/
 generated/
+
+#QtCreator
+aelang.config
+aelang.creator
+aelang.creator.user
+aelang.files
+aelang.includes
