@@ -4,7 +4,6 @@ generated/
 
 #QtCreator
 aelang.config
-aelang.creator
-aelang.creator.user
+aelang.creator*
 aelang.files
 aelang.includes
