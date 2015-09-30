@@ -19,28 +19,23 @@ cat - << EOF > ${GENERATED}/${MACRO}
 #define _1_AETEN_CONCATENATE(arg1, arg2)  _2_AETEN_CONCATENATE(arg1, arg2)
 #define _2_AETEN_CONCATENATE(arg1, arg2)  arg1##arg2
 
-#define _0_AETEN_FOR_EACH(what, ...)
-#define _1_AETEN_FOR_EACH(what, x, ...) what(x) _0_AETEN_FOR_EACH(__VA_ARGS__)
-$(for i in $(seq 2 ${ARGC_MAX}); do echo '#define _'${i}'_AETEN_FOR_EACH(what, x, ...) what(x) _'$((${i}-1))'_AETEN_FOR_EACH(what, __VA_ARGS__)'; done)
+#define _0_AETEN_FOR_EACH(...)
+#define _1_AETEN_FOR_EACH(what, x) what(x)
+$(for i in $(seq 2 ${ARGC_MAX}); do echo '#define _'${i}'_AETEN_FOR_EACH(what, x, ...) what(x) _'$((${i}-1))'_AETEN_FOR_EACH(what, ##__VA_ARGS__)'; done)
 
-#define AETEN_FOR_EACH_NARG(...) _AETEN_FOR_EACH_NARG(__VA_ARGS__, _AETEN_FOR_EACH_RSEQ_N())
+#define AETEN_FOR_EACH_NARG(...) _AETEN_FOR_EACH_NARG(,##__VA_ARGS__, _AETEN_FOR_EACH_RSEQ_N())
 #define _AETEN_FOR_EACH_NARG(...) _AETEN_FOR_EACH_ARG_N(__VA_ARGS__) 
-#define _AETEN_FOR_EACH_ARG_N(_$(seq -s,\ _ 0 ${ARGC_MAX}), N, ...) N
+#define _AETEN_FOR_EACH_ARG_N(_$(seq -s,\ _ 0 ${ARGC_MAX}), N, ...) N 
 #define _AETEN_FOR_EACH_RSEQ_N() $(seq -s,\  ${ARGC_MAX} -1 0)
  
 #define _AETEN_FOR_EACH(N, what, ...) AETEN_CONCATENATE(_, AETEN_CONCATENATE(N, _AETEN_FOR_EACH))(what, __VA_ARGS__)
 #define AETEN_FOR_EACH(what, ...) _AETEN_FOR_EACH(AETEN_FOR_EACH_NARG(__VA_ARGS__), what, __VA_ARGS__)
 
 #define _AETEN_SIZE_OF_EACH(t) sizeof(t),
-#define AETEN_SIZE_OF_EACH(...) { AETEN_FOR_EACH(_AETEN_SIZE_OF_EACH, ## __VA_ARGS__) (size_t)NULL }
-
-#define _AETEN_REF_OF_EACH(v) &v,
-#define AETEN_REF_OF_EACH(type, ...) (type*[]){ AETEN_FOR_EACH(_AETEN_REF_OF_EACH, ## __VA_ARGS__) (type*)NULL }
+#define AETEN_SIZE_OF_EACH(...) { AETEN_FOR_EACH(_AETEN_SIZE_OF_EACH, ##__VA_ARGS__) (size_t)NULL }
 
 #define _AETEN_STRING_OF_EACH(arg) #arg,
-#define AETEN_STRING_OF_EACH(...) { AETEN_FOR_EACH(_AETEN_STRING_OF_EACH, ## __VA_ARGS__) (char*)NULL }
+#define AETEN_STRING_OF_EACH(...) { AETEN_FOR_EACH(_AETEN_STRING_OF_EACH, ##__VA_ARGS__) (char*)NULL }
 
-#define AETEN_FIRST_ARG(first, ...) first
-#define AETEN_NOT_FIRST_ARG(first, ...) __VA_ARGS__
 #endif
 EOF
