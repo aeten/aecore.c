@@ -1,14 +1,14 @@
 #include <stdio.h>
 
-#include "aeten/lang/CopyOnWriteArrayList.h"
 #include "aeten/lang/import.h"
+#include "aeten/lang/CopyOnWriteArrayList.h"
 
-void print_methods(aeten_lang__interface_t *interface, int level) {
+void print_methods(interface_t *interface, int level) {
 	unsigned int i, mtd_i, arg_i, mtd_size, sign_size;
-	aeten_lang__type_t *type;
+	type_t *type;
 	mtd_size = interface->methods->size(interface->methods);
 	for (mtd_i=0; mtd_i<mtd_size; ++mtd_i) {
-		aeten_lang__method_definition_t *method = interface->methods->get(interface->methods, mtd_i);
+		method_definition_t *method = interface->methods->get(interface->methods, mtd_i);
 		printf("\n");
 		for (i=0; i<level+1; ++i) printf("\t");
 		printf("%s (", method->name);
@@ -21,7 +21,8 @@ void print_methods(aeten_lang__interface_t *interface, int level) {
 		printf("): %s /%u/", type->name, type->size);
 	}
 }
-void print_parents(aeten_lang__interface_t *interface, int level) {
+
+void print_parents(interface_t *interface, int level) {
 	int i;
 	for (i=0; i<level; ++i) printf("\t");
 	printf("%s(%x) {", interface->name, interface);
@@ -36,7 +37,7 @@ void print_parents(aeten_lang__interface_t *interface, int level) {
 
 int main(int argc, char **argv) {
 	int i, value;
-	aeten_lang__List *list = aeten_lang__new(aeten_lang__CopyOnWriteArrayList, sizeof(int), 5);
+	List *list = new_instance(CopyOnWriteArrayList, sizeof(int), 5);
 	for (i=0; i<10; ++i) {
 		list->add(list, (void*)&i);
 	}

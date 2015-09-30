@@ -1,7 +1,6 @@
-/* Already included by aeten/lang.h */
 #ifndef _AETEN_LANG_COPYONWRITEARRAYLIST_H
 #define _AETEN_LANG_COPYONWRITEARRAYLIST_H
-#include "aeten/lang/import.h"
+#include "aeten/lang.h"
 #include "aeten/lang/List.h"
 
 

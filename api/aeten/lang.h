@@ -1,3 +1,7 @@
+#ifdef _aeten_lang_IMPORT
+#include "aeten/lang/export.h"
+#endif
+
 #ifndef _AETEN_LANG_H
 #define _AETEN_LANG_H
 
@@ -8,9 +12,6 @@
 
 #include "aeten/lang/FOR_EACH.h"
 
-#ifdef AETEN_IMPORT
-#include "aeten/lang/export.h"
-#endif
 
 typedef struct aeten_lang__interface_st             aeten_lang__interface_t;
 typedef struct aeten_lang__class_st                 aeten_lang__class_t;
@@ -18,6 +19,9 @@ typedef struct aeten_lang__method_definition_st     aeten_lang__method_definitio
 typedef struct aeten_lang__method_implementation_st aeten_lang__method_implementation_t;
 typedef struct aeten_lang__type_st                  aeten_lang__type_t;
 typedef struct aeten_lang__object_header_st         aeten_lang__object_header_t;
+typedef struct aeten_lang__Signature_st             aeten_lang__Signature;
+typedef struct aeten_lang__MethodsList_st           aeten_lang__MethodsList;
+typedef struct aeten_lang__ParentsList_st           aeten_lang__ParentsList;
 
 typedef void   (*aeten_lang__initializer_t) (aeten_lang__interface_t*);
 typedef void   (*aeten_lang__finalizer_t)   (aeten_lang__interface_t*);
@@ -25,20 +29,20 @@ typedef void   (*aeten_lang__finalizer_t)   (aeten_lang__interface_t*);
 #define aeten_lang__object_header \
 	aeten_lang__interface_t *interface; \
 	aeten_lang__initializer_t initialize; \
-	aeten_lang__finalizer_t finalize;
+	aeten_lang__finalizer_t finalize
 
 struct aeten_lang__type_st {
 	char const *name;
 	size_t size;
 };
 
-typedef struct aeten_lang__Signature_st {
+struct aeten_lang__Signature_st {
 	aeten_lang__object_header;
 	size_t (*size)(/*aeten_lang__List*/void*);
 	/*void*/aeten_lang__type_t*  (*get) (/*aeten_lang__List*/void*, unsigned int);
 	//void   (*set) (/*aeten_lang__List*/void*, unsigned int, void*);
 	//void   (*add) (/*aeten_lang__List*/void*, /*void*/aeten_lang__method_definition_t*);
-} aeten_lang__Signature;
+};
 
 typedef struct aeten_lang__MethodsList_st {
 	aeten_lang__object_header;
@@ -64,7 +68,7 @@ struct aeten_lang__interface_st {
 };
 
 struct aeten_lang__object_header_st {
-	aeten_lang__object_header
+	aeten_lang__object_header;
 };
 
 struct aeten_lang__method_definition_st {
@@ -89,13 +93,13 @@ void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *n
 #	include<stdio.h>
 #	include <assert.h>
 #	undef AETEN_DEBUG
-	static char* _aeten_debug_tmp_str = 0;
+static char* _aeten_debug_tmp_str = 0;
 #	define AETEN_DEBUG(format, ...) do { \
-		fprintf(stderr, "%s +%d: " format "\n", __FILE__, __LINE__, __VA_ARGS__); \
-		if (_aeten_debug_tmp_str) { \
-			free(_aeten_debug_tmp_str); \
-			_aeten_debug_tmp_str = 0; \
-		} \
+	fprintf(stderr, "%s +%d: " format "\n", __FILE__, __LINE__, __VA_ARGS__); \
+	if (_aeten_debug_tmp_str) { \
+	free(_aeten_debug_tmp_str); \
+	_aeten_debug_tmp_str = 0; \
+	} \
 	} while (0)
 #	define AETEN_DEBUG_JOIN_STRINGS(src, join) _aeten_lang__join_strings(_aeten_debug_tmp_str, src, join)
 #	define AETEN_DEBUG_ASSERT(...) assert(__VA_ARGS__)
@@ -108,26 +112,26 @@ void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *n
 
 #if defined(__GNUC__)
 #	define _aeten_lang__constructor(fn) \
-		static void fn(void) __attribute__((constructor)); \
-		static void fn(void)
+	static void fn(void) __attribute__((constructor)); \
+	static void fn(void)
 #elif defined(_MSC_VER)
 #	define _aeten_lang__constructor(fn) \
-		static void __cdecl fn(void); \
-		__declspec(allocate(".CRT$XCU")) void (__cdecl *fn##_)(void) = fn; \
-		static void __cdecl fn(void)
+	static void __cdecl fn(void); \
+	__declspec(allocate(".CRT$XCU")) void (__cdecl *fn##_)(void) = fn; \
+	static void __cdecl fn(void)
 #endif
 
 #if defined(_aeten_lang__constructor) && !defined(_aeten_lang__destructor)
 #	define _aeten_lang__destructor(fn) \
-		static void fn(void);\
-		_aeten_lang__constructor(_aeten_lang__destructor_##fn) { \
-			atexit( fn ); \
-		} \
-		static void fn(void)
+	static void fn(void);\
+	_aeten_lang__constructor(_aeten_lang__destructor_##fn) { \
+	atexit( fn ); \
+	} \
+	static void fn(void)
 #endif
 
 #define aeten_lang__type_of(a) \
-  ((aeten_lang__type_t) { #a, sizeof(a) })
+	((aeten_lang__type_t) { #a, sizeof(a) })
 
 #define _AETEN_REF_OF_EACH_IFACE(iface) &iface##_i,
 
@@ -140,7 +144,7 @@ void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *n
 		_aeten_lang__construct(&iface##_i, #iface_name, (aeten_lang__interface_t*[]){ AETEN_FOR_EACH(_AETEN_REF_OF_EACH_IFACE, __VA_ARGS__) (aeten_lang__interface_t*)NULL }); \
 	}
 
-#define _AETEN_LANG_EACH_IFACE_METHODS(iface) iface##__methods(iface)
+#define _AETEN_LANG_EACH_IFACE_METHODS(iface) iface##__methods(iface);
 #define AETEN_LANG_EACH_IFACE_METHODS(...) AETEN_FOR_EACH(_AETEN_LANG_EACH_IFACE_METHODS, ##__VA_ARGS__)
 
 #define aeten_lang__implementation(implementation, prvt, ...) \
@@ -149,10 +153,10 @@ void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *n
 	_aeten_lang__define_type(_##implementation, implementation, ##__VA_ARGS__); \
 	typedef struct _##implementation##__private_st prvt _##implementation##__private_t; \
 	typedef struct _##implementation##_st { \
-		aeten_lang__object_header \
+		aeten_lang__object_header; \
 		AETEN_LANG_EACH_IFACE_METHODS(__VA_ARGS__) \
 		_##implementation##__private_t _private; \
-	} _##implementation##_t; \
+	} _##implementation##_t
 
 #define aeten_lang__interface(iface, ...) \
 	_aeten_lang__define_type(iface, iface, ##__VA_ARGS__); \
@@ -162,7 +166,7 @@ void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *n
 	struct iface##_st { \
 		aeten_lang__object_header; \
 		iface##__methods(iface); \
-	};
+	}
 
 #define aeten_lang__object__init(implementation, instance, ...) do { \
 	memset(instance, 0, sizeof(implementation)); \
@@ -175,12 +179,12 @@ void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *n
 #define aeten_lang__method(iface, type, nm, ...) \
 	typedef type (*iface##__##nm##_t)(__VA_ARGS__); \
 	_aeten_lang__constructor(_##iface##__##nm##_constr) { \
-		char *types[] = AETEN_STRING_OF_EACH(type, ##__VA_ARGS__); \
-		size_t sizes[] = AETEN_SIZE_OF_EACH(type, ##__VA_ARGS__); \
+	char *types[] = AETEN_STRING_OF_EACH(type, ##__VA_ARGS__); \
+	size_t sizes[] = AETEN_SIZE_OF_EACH(type, ##__VA_ARGS__); \
 		_aeten_lang__method_construct(&iface##_i, #nm,  types, sizes); \
 	}
 
-#define aeten_lang__new(iface, ...) \
+#define aeten_lang__new_instance(iface, ...) \
 	iface##__new(__VA_ARGS__)
 
 #define aeten_lang__init(iface, ...) \
@@ -190,7 +194,7 @@ void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *n
 #define aeten_lang__delete(object) do { \
 	object->finalize((aeten_lang__interface_t*)object); \
 	free(object); \
-} while(0)
+	} while(0)
 
 #define aeten_lang__call(object_ref, method, ...) \
 	object_ref->method(ref, __VA_ARGS__)
@@ -199,12 +203,9 @@ void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *n
 #define aeten_lang__cast_and_call(object_ref, type, method, ...) do { \
 	type * ref = aeten_lang__cast_ref(type, object_ref); \
 	ref->method(ref, __VA_ARGS__); \
-} while (0)
+} while (0);
 
 // TODO: check instance interfaces before
 #define aeten_lang__cast_ref(type, object_ref) ((type*) object_ref)
-
-#include "aeten/lang/List.h"
-//#include "aeten/lang/CopyOnWriteArrayList.h"
 
 #endif // AETEN_LANG_H

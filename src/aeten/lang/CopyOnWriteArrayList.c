@@ -3,7 +3,7 @@
 aeten_lang__List * aeten_lang__CopyOnWriteArrayList__new(size_t element_size, size_t initial_capacity) {
 	aeten_lang__CopyOnWriteArrayList *list = (aeten_lang__CopyOnWriteArrayList *) calloc(1, sizeof(aeten_lang__CopyOnWriteArrayList));
 	aeten_lang__CopyOnWriteArrayList__initialize(list, element_size, initial_capacity);
-	return cast_ref(aeten_lang__List, list);
+	return aeten_lang__cast_ref(aeten_lang__List, list);
 }
 
 aeten_lang__CopyOnWriteArrayList * aeten_lang__CopyOnWriteArrayList__initialize(aeten_lang__CopyOnWriteArrayList *list, size_t element_size, size_t initial_capacity) {
@@ -17,11 +17,11 @@ aeten_lang__CopyOnWriteArrayList * aeten_lang__CopyOnWriteArrayList__initialize(
 }
 
 void aeten_lang__CopyOnWriteArrayList__finalize(aeten_lang__List *list) {
-	free(cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.elements);
+	free(aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.elements);
 }
 
 void aeten_lang__CopyOnWriteArrayList__set(aeten_lang__List *list, unsigned int position, void *element) {
-	aeten_lang__CopyOnWriteArrayList *cow_list = cast_ref(aeten_lang__CopyOnWriteArrayList, list);
+	aeten_lang__CopyOnWriteArrayList *cow_list = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list);
 	if(position >= cow_list->_private.size) {
 		// TODO: throw exception
 	}
@@ -31,7 +31,7 @@ void aeten_lang__CopyOnWriteArrayList__set(aeten_lang__List *list, unsigned int 
 }
 
 void aeten_lang__CopyOnWriteArrayList__add(aeten_lang__List *list, void *element) {
-	aeten_lang__CopyOnWriteArrayList *cow_list = cast_ref(aeten_lang__CopyOnWriteArrayList, list);
+	aeten_lang__CopyOnWriteArrayList *cow_list = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list);
 	if (cow_list->_private.capacity == cow_list->_private.size) {
 		unsigned int capacity = cow_list->_private.capacity+(1 + ((cow_list->_private.capacity - 1) / 2));
 		void* elements = calloc(capacity, cow_list->_private.element_size);
@@ -45,7 +45,7 @@ void aeten_lang__CopyOnWriteArrayList__add(aeten_lang__List *list, void *element
 }
 
 void* aeten_lang__CopyOnWriteArrayList__get(aeten_lang__List *list, unsigned int position) {
-	aeten_lang__CopyOnWriteArrayList *cow_list = cast_ref(aeten_lang__CopyOnWriteArrayList, list);
+	aeten_lang__CopyOnWriteArrayList *cow_list = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list);
 	if(position >= cow_list->_private.size) {
 		// TODO: throw exception
 	}
@@ -55,6 +55,6 @@ void* aeten_lang__CopyOnWriteArrayList__get(aeten_lang__List *list, unsigned int
 }
 
 size_t aeten_lang__CopyOnWriteArrayList__size(aeten_lang__List *list) {
-	return cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.size;
+	return aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.size;
 }
 

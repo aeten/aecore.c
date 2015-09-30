@@ -1,25 +1,97 @@
 #!/bin/sh
 
 GENERATED=generated
-PACKAGE=aeten/lang
-INPUT_FILE=api/${PACKAGE}.h
-EXPORT=${GENERATED}/api/${PACKAGE}/export.h
-IMPORT=${GENERATED}/api/${PACKAGE}/import.h
-mkdir -p ${GENERATED}/api/${PACKAGE}
-PACKAGE=$(echo ${PACKAGE}|tr / _)
 
-cat - << EOF > ${EXPORT}
-#ifndef _${PACKAGE}_EXPORT_H
-#	define _${PACKAGE}_EXPORT_H
-#	ifdef AETEN_IMPORT
-$(sed -n 's@^#\s*define\s\+'${PACKAGE}'__\([^(^[:space:]]\+\).*@#\t\tdefine \1 '${PACKAGE}'__\1@p' ${INPUT_FILE}|sort -u)
+find_packages() {
+	local package
+	{
+		for header in $(find api -type f -name \*.h); do
+			if [ ${header} = $(echo ${header}|tr '[:upper:]' '[:lower:]') ] ; then
+				package=$(echo "${header}" | sed 's/.h$//')
+				[ -d "${package}" ] && echo ${package}
+			fi
+		done
+		find api -type d
+	} | sed 's@/$@@; s@^api$\|^api/@@; /^$/d' | sort -u
+}
+
+find_class_headers() {
+	{
+		[ -f ${1}.h ] && echo ${1}.h
+		for header in $(find ${1} -maxdepth 1 -type f -name \*.h); do
+			echo $(basename ${header})|grep -q '^[A-Z]' && echo "${header}"
+		done
+	} | sed -e 's@^api/@@'
+}
+
+SPACE='        '
+
+
+export_typedef() {
+	local INPUT_FILE=$1
+	local PACKAGE_NAME=$2
+	sed -n 's@//.*@@
+      s@/\*.*\*/@@g
+		s/^\s*typedef\s\s*\(struct\s\+\)\?[A-Za-z][a-zA-Z0-9_]*\s\s*'${PACKAGE_NAME}'__\([A-Za-z][a-zA-Z0-9_]*\).*$/#\t\tdefine \2'"${SPACE}${PACKAGE_NAME}"'__\2/p' ${INPUT_FILE};
+	# TODO
+	#typedef rettype (*${PACKAGE_NAME}__\1) (.*);
+}
+
+export_macros() {
+	local INPUT_FILE=$1
+	local PACKAGE_NAME=$2
+	sed -n 's@^#\s*define\s\+'${PACKAGE_NAME}'__\([^(^[:space:]]\+\).*@#\t\tdefine \1'"${SPACE}${PACKAGE_NAME}"'__\1@p' ${INPUT_FILE}|sort -u
+}
+
+export_interface() {
+	local INPUT_FILE=$1
+	local PACKAGE_NAME=$2
+	sed -n 's@//.*@@
+		s@/\*.*\*/@@g
+		s/^\s*\(aeten_lang__\)\?method\s*(\s*\('${PACKAGE_NAME}'__\([A-Z][a-zA-Z0-9_]*\)\)\s*,\s*[a-zA-Z][a-zA-Z0-9_]*\s*\**\s*,\s*\([a-z][a-zA-Z0-9_]*\).*$/#\t\tdefine \3'"${SPACE}"'\2/p' ${INPUT_FILE}|sort -u
+}
+
+export_implementation() {
+	local INPUT_FILE=$1
+	local PACKAGE_NAME=$2
+	sed -n 's@//.*@@
+		s@/\*.*\*/@@g
+		s/^\s*\(aeten_lang__\)\?implementation\s*(\s*\('${PACKAGE_NAME}'__\([A-Z][a-zA-Z0-9_]*\)\).*$/#\t\tdefine \3'"${SPACE}"'\2/p' ${INPUT_FILE}|sort -u
+	sed -n 's@//.*@@
+		s@/\*.*\*/@@g
+		s/^\s*[a-zA-Z][a-zA-Z0-9_]*\s*\**\s*\('${PACKAGE_NAME}'__\([A-Z][a-zA-Z0-9_]*\)\).*$/#\t\tdefine \2'"${SPACE}"'\1/p' ${INPUT_FILE}|sort -u
+}
+
+for PACKAGE in $(find_packages); do
+	EXPORT=${GENERATED}/api/${PACKAGE}/export.h
+	IMPORT=${GENERATED}/api/${PACKAGE}/import.h
+	mkdir -p ${GENERATED}/api/${PACKAGE}
+	PACKAGE_NAME=$(echo ${PACKAGE}|tr / _)
+		cat - << EOF > ${IMPORT}
+#define _${PACKAGE_NAME}_IMPORT
+#  include "${PACKAGE}.h"
+#undef _${PACKAGE_NAME}_IMPORT
+EOF
+		cat - << EOF > ${EXPORT}
+#ifndef _${PACKAGE_NAME}_EXPORT_H
+#	define _${PACKAGE_NAME}_EXPORT_H
+#	ifdef _${PACKAGE_NAME}_IMPORT
+EOF
+
+	for INPUT_FILE in $(find_class_headers api/${PACKAGE}); do
+		cat - << EOF >> ${EXPORT}
+
+/* From ${INPUT_FILE} */
+$(export_typedef api/${INPUT_FILE} ${PACKAGE_NAME})
+$(export_macros api/${INPUT_FILE} ${PACKAGE_NAME})
+$(export_interface api/${INPUT_FILE} ${PACKAGE_NAME})
+$(export_implementation api/${INPUT_FILE} ${PACKAGE_NAME})
+EOF
+
+	done
+		cat - << EOF >> ${EXPORT}
+
 #	endif
 #endif
 EOF
-
-cat - << EOF > ${IMPORT}
-#define AETEN_IMPORT
-#  include "aeten/lang.h"
-#undef AETEN_IMPORT
-EOF
-
+done

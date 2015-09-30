@@ -1,14 +1,17 @@
 #ifndef AETEN_LANG_ARRAYLIST_H
 #define AETEN_LANG_ARRAYLIST_H
 
-#include "aeten/lang/import.h"
+#include <stddef.h>
+
+#include "aeten/lang.h"
 #include "aeten/lang/List.h"
 
-implementation(aeten_lang__ArrayList, {
+
+aeten_lang__implementation(aeten_lang__ArrayList, {
 	size_t length;
 	size_t element_size;
 	void *elements;
-}, aeten_lang__List) 
+}, aeten_lang__List);
 
 aeten_lang__ArrayList * aeten_lang__ArrayList__initialize(aeten_lang__ArrayList *list, size_t element_size, size_t length);
 aeten_lang__List * aeten_lang__ArrayList__new(size_t element_size, size_t length);
