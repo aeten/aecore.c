@@ -48,7 +48,7 @@ export_interface() {
 	local PACKAGE_NAME=$2
 	sed -n 's@//.*@@
 		s@/\*.*\*/@@g
-		s/^\s*\(aeten_lang__\)\?method\s*(\s*\('${PACKAGE_NAME}'__\([A-Z][a-zA-Z0-9_]*\)\)\s*,\s*[a-zA-Z][a-zA-Z0-9_]*\s*\**\s*,\s*\([a-z][a-zA-Z0-9_]*\).*$/#\t\tdefine \3'"${SPACE}"'\2/p' ${INPUT_FILE}|sort -u
+		s/^\s*\(aeten_lang__\)\?interface\s*(\s*\('${PACKAGE_NAME}'__\([A-Z][a-zA-Z0-9_]*\)\)\s*.*$/#\t\tdefine \3'"${SPACE}"'\2/p' ${INPUT_FILE}|sort -u
 }
 
 export_implementation() {

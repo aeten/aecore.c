@@ -36,7 +36,7 @@ char *_aeten_lang__join_strings(char *dest, char* src[], char join) {
 void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *name, char *signature_types[], size_t signature_sizes[]) {
 	unsigned int i;
 	size_t size;
-    for (size=0; signature_types[size]; ++size) {}
+	for (size=0; signature_types[size]; ++size) {}
 	AETEN_DEBUG("Adds method %s.%s(%s): %s", iface->name, name, AETEN_DEBUG_JOIN_STRINGS(signature_types+1, ','), *signature_types, size);
 
 	aeten_lang__method_definition_t method = {

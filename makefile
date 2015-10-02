@@ -18,7 +18,7 @@ $(info Build ${NAME} ${VERSION})
 
 .PHONY: check all lib clean debug generator
 
-all: lib
+all: check #lib
 
 lib: ${LIB}
 

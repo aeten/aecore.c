@@ -37,7 +37,7 @@ void print_parents(interface_t *interface, int level) {
 
 int main(int argc, char **argv) {
 	int i, value;
-	List *list = new_instance(CopyOnWriteArrayList, sizeof(int), 5);
+	List *list = (List *)new_instance(CopyOnWriteArrayList, sizeof(int), 5);
 	for (i=0; i<10; ++i) {
 		list->add(list, (void*)&i);
 	}
