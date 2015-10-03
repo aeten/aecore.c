@@ -31,14 +31,17 @@ struct aeten_lang__type_st {
 	size_t size;
 };
 
+#define _aeten_lang__object_header \
+	aeten_lang__interface_t *_interface; \
+	aeten_lang__initializer_t _initialize; \
+	aeten_lang__finalizer_t _finalize
+
 struct aeten_lang__object_header_st {
-	aeten_lang__interface_t *interface;
-	aeten_lang__initializer_t initialize;
-	aeten_lang__finalizer_t finalize;
+	_aeten_lang__object_header;
 };
 
 #define _aeten_lang__InterfaceList \
-	aeten_lang__object_header_t _header; \
+	_aeten_lang__object_header; \
 	size_t (*size)(/*aeten_lang__List*/void*)
 
 struct aeten_lang__Signature_st {
@@ -126,16 +129,12 @@ static char* _aeten_debug_tmp_str = 0;
 #define aeten_lang__type_of(a) \
 	((aeten_lang__type_t) { #a, sizeof(a) })
 
-#define aeten_lang__new_instance(iface, ...) _aeten_lang__new_instance_1(iface, ##__VA_ARGS__)
-#define _aeten_lang__new_instance_1(iface, ...) \
-	iface##__new(__VA_ARGS__)
-
 #define aeten_lang__init(iface, ...) \
 	iface AETEN_FIRST_ARG(__VA_ARGS__); \
 	iface##__init(&__VA_ARGS__);
 
 #define aeten_lang__delete(object) do { \
-		object->_header.finalize((aeten_lang__interface_t*)object); \
+		object->_finalize((aeten_lang__interface_t*)object); \
 		free(object); \
 	} while(0)
 

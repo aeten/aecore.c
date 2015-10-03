@@ -37,7 +37,7 @@ void print_parents(aeten_lang__interface_t *interface, int level) {
 
 int main(int argc, char **argv) {
 	int i, value;
-	List *list = new_instance(CopyOnWriteArrayList, sizeof(int), 5);
+	List* list = aeten_lang__CopyOnWriteArrayList__new(sizeof(int), 5);
 	for (i=0; i<10; ++i) {
 		list->add(list, (void*)&i);
 	}
@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
 		AETEN_DEBUG_ASSERT(value==i);
 		printf("Value of list[%d]=%d\n", i, value);
 	}
-	print_parents(list->_header.interface, 0);
+	print_parents(list->_interface, 0);
 	delete(list);
 	return 0;
 }

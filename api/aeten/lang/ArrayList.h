@@ -10,7 +10,7 @@
 	aeten_lang__private(size_t length, size_t element_size, void *elements)
 
 #define AETEN_LANG_CONSTRUCTORS \
-	aeten_lang__constructor(size_t element_size, size_t length)
+	aeten_lang__constructor(size_t /*element_size*/, size_t /*length*/)
 
 #include "aeten/lang/List.h"
 #include "aeten/lang/implementation.h"

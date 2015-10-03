@@ -39,7 +39,7 @@
 
 	//typedef struct _##impl##_st { header + methods } _##impl##_t;
 	typedef struct _AETEN_LANG_IMPL(_, _st) {
-		aeten_lang__object_header_t _header;
+		_aeten_lang__object_header;
 		AETEN_LANG_METHODS
 		_AETEN_LANG_IMPL(_, __private_t) _private;
 	} AETEN_LANG_IMPLEMENTATION_H;
@@ -57,8 +57,21 @@
 
 	//iface* impl##__new(__VA_ARGS__)
 	#undef  aeten_lang__constructor
-	#define aeten_lang__constructor(...) \
-		AETEN_LANG_INTERFACE* _AETEN_LANG_IMPL(, __new)(__VA_ARGS__);
+	#ifdef AETEN_LANG_IMPLEMENTATION_C
+		#define _aeten_lang__arg_1(i, x) x x##_##i
+		#define _aeten_lang__arg_2(i, x) x##_##i
+		#define _aeten_lang__arg_3(...) _aeten_lang__arg_4(__VA_ARGS__)
+		#define _aeten_lang__arg_4(...) __VA_ARGS__
+		#define aeten_lang__constructor(...) \
+			AETEN_LANG_INTERFACE* _AETEN_LANG_IMPL(, __new)(_aeten_lang__arg_3(AETEN_FOR_EACH_I(_aeten_lang__arg_1, ##__VA_ARGS__))) { \
+			AETEN_LANG_IMPLEMENTATION_H *instance = (AETEN_LANG_IMPLEMENTATION_H *) calloc(1, sizeof(AETEN_LANG_IMPLEMENTATION_H)); \
+			_AETEN_LANG_IMPL(, __initialize)(instance, AETEN_FOR_EACH_I(_aeten_lang__arg_2, ##__VA_ARGS__)); \
+			return aeten_lang__cast_ref(AETEN_LANG_INTERFACE, instance); \
+		}
+	#else
+		#define aeten_lang__constructor(...) \
+			AETEN_LANG_INTERFACE* _AETEN_LANG_IMPL(, __new)(__VA_ARGS__);
+	#endif
 	AETEN_LANG_CONSTRUCTORS
 
 	//void impl##__finalize(impl*)
@@ -70,9 +83,9 @@
 	#ifdef AETEN_LANG_IMPLEMENTATION_C
 	{
 		memset(instance, 0, sizeof(AETEN_LANG_IMPLEMENTATION_H));
-		instance->_header.interface = &_AETEN_LANG_IMPL(_, _i);
-		instance->_header.initialize = (aeten_lang__initializer_t)_AETEN_LANG_IMPL(, __initialize);
-		instance->_header.finalize = (aeten_lang__finalizer_t)_AETEN_LANG_IMPL(, __finalize);
+		instance->_interface = &_AETEN_LANG_IMPL(_, _i);
+		instance->_initialize = (aeten_lang__initializer_t)_AETEN_LANG_IMPL(, __initialize);
+		instance->_finalize = (aeten_lang__finalizer_t)_AETEN_LANG_IMPL(, __finalize);
 		/* methods */
 		#undef  aeten_lang__method
 		#define aeten_lang__method(type, mthd, ...) \

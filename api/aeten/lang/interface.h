@@ -30,7 +30,7 @@ AETEN_LANG_INTERFACE
 
 /* {{{ Method structure */
 	typedef struct _AETEN_LANG_IFACE(_, _st) {
-		aeten_lang__object_header_t _header;
+		_aeten_lang__object_header;
 #		define aeten_lang__method(type, name, ...) type (*name)(AETEN_LANG_INTERFACE*, ##__VA_ARGS__)
 		AETEN_LANG_METHODS
 #		undef aeten_lang__method
