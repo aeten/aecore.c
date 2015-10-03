@@ -12,7 +12,6 @@
 
 #include "aeten/lang/FOR_EACH.h"
 
-
 typedef struct aeten_lang__interface_st             aeten_lang__interface_t;
 typedef struct aeten_lang__class_st                 aeten_lang__class_t;
 typedef struct aeten_lang__method_definition_st     aeten_lang__method_definition_t;
@@ -26,39 +25,36 @@ typedef struct aeten_lang__ParentsList_st           aeten_lang__ParentsList;
 typedef void   (*aeten_lang__initializer_t) (aeten_lang__interface_t*);
 typedef void   (*aeten_lang__finalizer_t)   (aeten_lang__interface_t*);
 
-#define aeten_lang__object_header \
-	aeten_lang__interface_t *interface; \
-	aeten_lang__initializer_t initialize; \
-	aeten_lang__finalizer_t finalize
 
 struct aeten_lang__type_st {
 	char const *name;
 	size_t size;
 };
 
-struct aeten_lang__Signature_st {
-	aeten_lang__object_header;
-	size_t (*size)(/*aeten_lang__List*/void*);
-	/*void*/aeten_lang__type_t*  (*get) (/*aeten_lang__List*/void*, unsigned int);
-	//void   (*set) (/*aeten_lang__List*/void*, unsigned int, void*);
-	//void   (*add) (/*aeten_lang__List*/void*, /*void*/aeten_lang__method_definition_t*);
+struct aeten_lang__object_header_st {
+	aeten_lang__interface_t *interface;
+	aeten_lang__initializer_t initialize;
+	aeten_lang__finalizer_t finalize;
 };
 
-typedef struct aeten_lang__MethodsList_st {
-	aeten_lang__object_header;
-	size_t (*size)(/*aeten_lang__List*/void*);
-	/*void*/aeten_lang__method_definition_t*  (*get) (/*aeten_lang__List*/void*, unsigned int);
-	//void   (*set) (/*aeten_lang__List*/void*, unsigned int, void*);
-	//void   (*add) (/*aeten_lang__List*/void*, /*void*/aeten_lang__method_definition_t*);
-} aeten_lang__MethodsList;
+#define _aeten_lang__InterfaceList \
+	aeten_lang__object_header_t _header; \
+	size_t (*size)(/*aeten_lang__List*/void*)
 
-typedef struct aeten_lang__ParentsList_st {
-	aeten_lang__object_header;
-	size_t (*size)(/*aeten_lang__List*/void*);
-	/*void*/aeten_lang__interface_t*  (*get) (/*aeten_lang__List*/void*, unsigned int);
-	//void   (*set) (/*aeten_lang__List*/void*, unsigned int, void*);
-	//void   (*add) (/*aeten_lang__List*/void*, /*void*/aeten_lang__interface_definition_t*);
-} aeten_lang__ParentsList;
+struct aeten_lang__Signature_st {
+	_aeten_lang__InterfaceList;
+	aeten_lang__type_t*  (*get) (aeten_lang__Signature*, unsigned int);
+};
+
+struct aeten_lang__MethodsList_st {
+	_aeten_lang__InterfaceList;
+	aeten_lang__method_definition_t*  (*get) (aeten_lang__MethodsList*, unsigned int);
+};
+
+struct aeten_lang__ParentsList_st {
+	_aeten_lang__InterfaceList;
+	aeten_lang__interface_t*  (*get) (aeten_lang__ParentsList*, unsigned int);
+};
 
 struct aeten_lang__interface_st {
 	char const *name;
@@ -67,9 +63,6 @@ struct aeten_lang__interface_st {
 	aeten_lang__ParentsList* parents;
 };
 
-struct aeten_lang__object_header_st {
-	aeten_lang__object_header;
-};
 
 struct aeten_lang__method_definition_st {
 	aeten_lang__interface_t const *interface;
@@ -142,17 +135,17 @@ static char* _aeten_debug_tmp_str = 0;
 	iface##__init(&__VA_ARGS__);
 
 #define aeten_lang__delete(object) do { \
-		object->finalize((aeten_lang__interface_t*)object); \
+		object->_header.finalize((aeten_lang__interface_t*)object); \
 		free(object); \
 	} while(0)
 
 #define aeten_lang__call(object_ref, method, ...) \
-	object_ref->method(ref, __VA_ARGS__)
+	object_ref->method(object_ref, ##__VA_ARGS__)
 
 #define aeten_lang__cnc aeten_lang__cast_and_call
 #define aeten_lang__cast_and_call(object_ref, type, method, ...) do { \
 	type * ref = aeten_lang__cast_ref(type, object_ref); \
-	ref->method(ref, __VA_ARGS__); \
+	ref->method(ref, ##__VA_ARGS__); \
 } while (0);
 
 // TODO: check instance interfaces before
@@ -168,7 +161,7 @@ static char* _aeten_debug_tmp_str = 0;
 	static aeten_lang__interface_t _##iface##_i; \
 	aeten_lang__static_constructor(_##iface##_c) { \
 		_aeten_lang__construct(&_##iface##_i, #iface, (aeten_lang__interface_t*[]) { \
-								  AETEN_FOR_EACH(_AETEN_REF_OF_EACH_IFACE, ##__VA_ARGS__) (aeten_lang__interface_t*)NULL \
+			AETEN_FOR_EACH(_AETEN_REF_OF_EACH_IFACE, ##__VA_ARGS__) (aeten_lang__interface_t*)NULL \
 	 }); \
 	}
 

@@ -1,23 +1,23 @@
 #define AETEN_LANG_IMPLEMENTATION_C
 #include "aeten/lang/CopyOnWriteArrayList.h"
 
-aeten_lang__CopyOnWriteArrayList * aeten_lang__CopyOnWriteArrayList__new(size_t element_size, size_t initial_capacity) {
+aeten_lang__List * aeten_lang__CopyOnWriteArrayList__new(size_t element_size, size_t initial_capacity) {
 	aeten_lang__CopyOnWriteArrayList *list = (aeten_lang__CopyOnWriteArrayList *) calloc(1, sizeof(aeten_lang__CopyOnWriteArrayList));
 	aeten_lang__CopyOnWriteArrayList__initialize(list, element_size, initial_capacity);
-	return list;
+	return aeten_lang__cast_ref(aeten_lang__List, list);
 }
 
-aeten_lang__CopyOnWriteArrayList * aeten_lang__CopyOnWriteArrayList__initialize(aeten_lang__CopyOnWriteArrayList *list, size_t element_size, size_t initial_capacity) {
+aeten_lang__List * aeten_lang__CopyOnWriteArrayList__initialize(aeten_lang__CopyOnWriteArrayList *list, size_t element_size, size_t initial_capacity) {
 	_aeten_lang__CopyOnWriteArrayList__init(list);
 	list->_private.element_size = element_size;
 	list->_private.elements = calloc(initial_capacity, element_size);
 	list->_private.capacity = initial_capacity;
 	list->_private.size = 0;
-	return list;
+	return aeten_lang__cast_ref(aeten_lang__List, list);
 }
 
-void aeten_lang__CopyOnWriteArrayList__finalize(aeten_lang__List *list) {
-	free(aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.elements);
+void aeten_lang__CopyOnWriteArrayList__finalize(aeten_lang__CopyOnWriteArrayList *list) {
+	free(list->_private.elements);
 }
 
 void aeten_lang__CopyOnWriteArrayList__set(aeten_lang__List *list, unsigned int position, void *element) {
