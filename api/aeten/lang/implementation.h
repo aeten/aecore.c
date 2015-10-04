@@ -52,14 +52,14 @@
 
 	//iface* impl##__initialize(__VA_ARGS__)
 	#define aeten_lang__constructor(...) \
-		AETEN_LANG_INTERFACE* _AETEN_LANG_IMPL(, __initialize)(AETEN_LANG_IMPLEMENTATION_H* instance, __VA_ARGS__);
+		AETEN_LANG_INTERFACE* _AETEN_LANG_IMPL(, __initialize)(AETEN_LANG_IMPLEMENTATION_H* instance, ##__VA_ARGS__);
 	AETEN_LANG_CONSTRUCTORS
 
 	//iface* impl##__new(__VA_ARGS__)
 	#undef  aeten_lang__constructor
 	#ifdef AETEN_LANG_IMPLEMENTATION_C
-		#define _aeten_lang__arg_1(i, x) x x##_##i
-		#define _aeten_lang__arg_2(i, x) x##_##i
+		#define _aeten_lang__arg_1(i, x) x arg_##i
+		#define _aeten_lang__arg_2(i, x) arg_##i
 		#define _aeten_lang__arg_3(...) _aeten_lang__arg_4(__VA_ARGS__)
 		#define _aeten_lang__arg_4(...) __VA_ARGS__
 		#define aeten_lang__constructor(...) \
@@ -98,15 +98,27 @@
 /*	}}} */
 
 
-	#undef aeten_lang__implementation
+#undef aeten_lang__implementation
+#define aeten_lang__implementation(impl, iface) iface
+#if defined(AETEN_LANG_IMPLEMENTATION_C) && (AETEN_LANG_IMPLEMENTATION_H == AETEN_LANG_INTERFACE)
+	#undef AETEN_LANG_METHODS
+	#undef AETEN_LANG_INTERFACE
+#endif
+#undef aeten_lang__implementation
 	#undef aeten_lang__constructor
 	#undef aeten_lang__private
 	#undef aeten_lang__method
 	#undef _AETEN_LANG_IMPL
 	#undef _AETEN_LANG_IMPL_1
 	#undef _AETEN_LANG_IMPL_2
-	#undef AETEN_LANG_METHODS
-	#undef AETEN_LANG_INTERFACE
 	#undef AETEN_LANG_IMPLEMENTATION_H
+	#undef AETEN_LANG_PRIVATE
+	#undef AETEN_LANG_CONSTRUCTORS
+
+	#ifdef AETEN_LANG_IMPLEMENTATION_C
+		#undef AETEN_LANG_IMPLEMENTATION_C
+		#undef AETEN_LANG_METHODS
+		#undef AETEN_LANG_INTERFACE
+	#endif
 
 #endif

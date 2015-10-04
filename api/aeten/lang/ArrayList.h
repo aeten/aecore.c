@@ -1,5 +1,4 @@
-#ifndef AETEN_LANG_ARRAYLIST_H
-#define AETEN_LANG_ARRAYLIST_H
+#pragma once
 
 #include <stddef.h>
 
@@ -7,12 +6,10 @@
 	aeten_lang__implementation(aeten_lang__ArrayList, aeten_lang__List)
 
 #define AETEN_LANG_PRIVATE \
-	aeten_lang__private(size_t length, size_t element_size, void *elements)
+	aeten_lang__private(size_t capacity, size_t size, size_t element_size, void *elements)
 
 #define AETEN_LANG_CONSTRUCTORS \
-	aeten_lang__constructor(size_t /*element_size*/, size_t /*length*/)
+	aeten_lang__constructor(size_t /*element_size*/, size_t /*initial_capacity*/)
 
 #include "aeten/lang/List.h"
 #include "aeten/lang/implementation.h"
-
-#endif

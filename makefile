@@ -18,9 +18,11 @@ $(info Build ${NAME} ${VERSION})
 
 .PHONY: check all lib clean debug generator
 
-all: lib
+all: check lib
 
 lib: ${LIB}
+
+tests: ${BUILD}/test/lang
 
 check: ${BUILD}/test/lang
 	@for procedure in $^; do ./$$procedure || exit 1; done
@@ -37,9 +39,10 @@ generator:
 
 ${SRC_O}: ${HDR_O}
 
+# No way to disable warning "#pragma once in main file" which appends systematicaly on single header compilation
 ${BUILD}/%.h.o: %.h generator
 	@-mkdir --parent $$(dirname $@)
-	${CC} -c ${CCFLAGS} $< -Iapi -I${GENERATED}/api -o $@
+	${CC} -c ${CCFLAGS} $< -Iapi -I${GENERATED}/api -o $@ 2>&1 | sed '/warning: #pragma once in main file/,+2d'
 
 ${BUILD}/%.o: %.c ${HDR}
 	@-mkdir --parent $$(dirname $@)

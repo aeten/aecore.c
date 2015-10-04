@@ -1,5 +1,4 @@
-#ifndef _AETEN_LANG_LIST_H
-#define _AETEN_LANG_LIST_H
+#pragma once
 
 #define AETEN_LANG_INTERFACE \
 	aeten_lang__interface(aeten_lang__List)
@@ -18,5 +17,3 @@
 	aeten_lang__method(void, add, void* /* element */);
 
 #include "aeten/lang/interface.h"
-
-#endif

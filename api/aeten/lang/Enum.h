@@ -1,14 +1,9 @@
-#ifndef AETEN_LANG_ENUM_H
-#define AETEN_LANG_ENUM_H
+#pragma once
 
-#include "aeten/lang/import.h"
-
-#define AETEN_LANG_IMPLEMENTATION_H \
+#define AETEN_LANG_INTERFACE \
 	aeten_lang__interface(aeten_lang__Enum)
 
 #define AETEN_LANG_METHODS \
 	aeten_lang__method(int, value);
 
 #include "aeten/lang/interface.h"
-
-#endif // AETEN_LANG_ENUM_H

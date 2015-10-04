@@ -1,7 +1,11 @@
 #include "aeten/lang.h"
 
 #ifdef AETEN_LANG_INTERFACE
+#	define _AETEN_LANG_IFACE(prefix, suffix) _AETEN_LANG_IFACE_1(prefix, AETEN_LANG_INTERFACE, suffix)
+#	define _AETEN_LANG_IFACE_1(prefix, iface, suffix) _AETEN_LANG_IFACE_2(prefix, iface, suffix)
+#	define _AETEN_LANG_IFACE_2(prefix, iface, suffix) prefix##iface##suffix
 
+#	undef aeten_lang__interface
 #	define aeten_lang__interface(iface, ...) \
 	_aeten_lang__define_type(iface, ##__VA_ARGS__) \
 	_aeten_lang__destructor(_##iface##_d) { \
@@ -11,9 +15,6 @@ AETEN_LANG_INTERFACE
 #	undef aeten_lang__interface
 
 #	define aeten_lang__interface(iface, ...) iface
-#	define _AETEN_LANG_IFACE(prefix, suffix) _AETEN_LANG_IFACE_1(prefix, AETEN_LANG_INTERFACE, suffix)
-#	define _AETEN_LANG_IFACE_1(prefix, iface, suffix) _AETEN_LANG_IFACE_2(prefix, iface, suffix)
-#	define _AETEN_LANG_IFACE_2(prefix, iface, suffix) prefix##iface##suffix
 
 #	ifdef AETEN_LANG_METHODS
 /* {{{ Method definition */
@@ -37,13 +38,17 @@ AETEN_LANG_INTERFACE
 	} _AETEN_LANG_IFACE(_, _t);
 /* }}} */
 
-#	ifndef AETEN_LANG_IMPLEMENTATION_H
-#		undef AETEN_LANG_METHODS
-#		undef AETEN_LANG_INTERFACE
-#	endif
-#	undef aeten_lang__method
-#	undef aeten_lang__interface
-
 #	endif// Methods
+
+#define aeten_lang__implementation(impl, iface) iface
+#if !defined(AETEN_LANG_IMPLEMENTATION_H)
+//	#pragma message ("Unset AETEN_LANG_METHODS & AETEN_LANG_INTERFACE from " __FILE__)
+	#undef AETEN_LANG_METHODS
+	#undef AETEN_LANG_INTERFACE
+#endif
+#undef aeten_lang__implementation
+
+#undef aeten_lang__method
+#undef aeten_lang__interface
 
 #endif

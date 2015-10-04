@@ -2,6 +2,7 @@
 
 #include "aeten/lang/import.h"
 #include "aeten/lang/CopyOnWriteArrayList.h"
+#include "aeten/lang/ArrayList.h"
 
 void print_methods(interface_t *interface, int level) {
 	unsigned int i, mtd_i, arg_i, mtd_size, sign_size;
@@ -37,12 +38,13 @@ void print_parents(aeten_lang__interface_t *interface, int level) {
 
 int main(int argc, char **argv) {
 	int i, value;
-	List* list = aeten_lang__CopyOnWriteArrayList__new(sizeof(int), 5);
+//	List* list = aeten_lang__CopyOnWriteArrayList__new(sizeof(int));
+	List* list = aeten_lang__ArrayList__new(sizeof(int), 5);
 	for (i=0; i<10; ++i) {
 		list->add(list, (void*)&i);
 	}
 	for (i=0; i<list->size(list); ++i) {
-		value = *((int*) list->get(list, i));
+		value = *((int*) list->get(list, i+20));
 		AETEN_DEBUG_ASSERT(value==i);
 		printf("Value of list[%d]=%d\n", i, value);
 	}

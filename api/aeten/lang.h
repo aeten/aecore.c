@@ -8,7 +8,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include "aeten/lang/String.h"
 
 #include "aeten/lang/FOR_EACH.h"
 
@@ -21,6 +21,8 @@ typedef struct aeten_lang__object_header_st         aeten_lang__object_header_t;
 typedef struct aeten_lang__Signature_st             aeten_lang__Signature;
 typedef struct aeten_lang__MethodsList_st           aeten_lang__MethodsList;
 typedef struct aeten_lang__ParentsList_st           aeten_lang__ParentsList;
+typedef struct aeten_lang__array_st                 aeten_lang__array_t;
+
 
 typedef void   (*aeten_lang__initializer_t) (aeten_lang__interface_t*);
 typedef void   (*aeten_lang__finalizer_t)   (aeten_lang__interface_t*);
@@ -31,10 +33,16 @@ struct aeten_lang__type_st {
 	size_t size;
 };
 
+struct aeten_lang__array_st {
+	size_t length;
+	size_t element_size;
+	void*  elements;
+};
+
 #define _aeten_lang__object_header \
-	aeten_lang__interface_t *_interface; \
+	aeten_lang__interface_t   *_interface; \
 	aeten_lang__initializer_t _initialize; \
-	aeten_lang__finalizer_t _finalize
+	aeten_lang__finalizer_t   _finalize
 
 struct aeten_lang__object_header_st {
 	_aeten_lang__object_header;
@@ -61,8 +69,7 @@ struct aeten_lang__ParentsList_st {
 
 struct aeten_lang__interface_st {
 	char const *name;
-	aeten_lang__MethodsList *methods;
-	/* Image of aeten_lang__List */
+	aeten_lang__MethodsList* methods;
 	aeten_lang__ParentsList* parents;
 };
 
@@ -91,11 +98,11 @@ void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *n
 #	undef AETEN_DEBUG
 static char* _aeten_debug_tmp_str = 0;
 #	define AETEN_DEBUG(format, ...) do { \
-	fprintf(stderr, "%s +%d: " format "\n", __FILE__, __LINE__, __VA_ARGS__); \
-	if (_aeten_debug_tmp_str) { \
-	free(_aeten_debug_tmp_str); \
-	_aeten_debug_tmp_str = 0; \
-	} \
+		fprintf(stderr, "%s +%d: " format "\n", __FILE__, __LINE__, __VA_ARGS__); \
+		if (_aeten_debug_tmp_str) { \
+			free(_aeten_debug_tmp_str); \
+			_aeten_debug_tmp_str = 0; \
+		} \
 	} while (0)
 #	define AETEN_DEBUG_JOIN_STRINGS(src, join) _aeten_lang__join_strings(_aeten_debug_tmp_str, src, join)
 #	define AETEN_DEBUG_ASSERT(...) assert(__VA_ARGS__)
@@ -146,6 +153,26 @@ static char* _aeten_debug_tmp_str = 0;
 	type * ref = aeten_lang__cast_ref(type, object_ref); \
 	ref->method(ref, ##__VA_ARGS__); \
 } while (0);
+
+/** Start a try block whith potentially aeten_lang__Closable resources */
+#define aeten_lang__try(...)
+#define aeten_lang__catch(exception, ...) \
+
+static __thread void* _aeten_lang__raised_exception;
+
+/** Check expression or throws exception (TODO) */
+// TODO: goto aeten_lang__catch__##exception;
+#define aeten_lang__check(expression, exception, message_format, ...) do { \
+		if (!(expression)) { \
+			char* message = aeten_lang__string_from_format(message_format, ##__VA_ARGS__); \
+			char* prefixed_message = aeten_lang__string_from_format("%s +%u: Check (%s): %s (%s)", __func__, __LINE__, #expression, #exception, message); \
+			aeten_lang__Exception* excpt = exception##__new(prefixed_message); \
+			free(message); \
+			free(prefixed_message); \
+			excpt->print_message(excpt); \
+		} \
+	} while (0);
+
 
 // TODO: check instance interfaces before
 #define aeten_lang__cast_ref(type, object_ref) ((type*) object_ref)
