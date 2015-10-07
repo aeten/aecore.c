@@ -11,12 +11,14 @@ LIB=${BUILD}/${NAME}-${VERSION}.so
 HDR=$(shell find api -type f -name \*.h) ${GEN}
 SRC=$(shell find src -type f -name \*.c)
 
+GEN=$(shell ./generator/export -l) $(shell ./generator/for-each-macro -l)
 HDR_O=$(addprefix ${BUILD}/,$(patsubst %.h,%.h.o,${HDR}))
 SRC_O=$(addprefix ${BUILD}/,$(patsubst %.c,%.o,${SRC}))
 
+
 $(info Build ${NAME} ${VERSION})
 
-.PHONY: check all lib clean debug generator
+.PHONY: check clean debug
 
 all: check lib
 
@@ -33,7 +35,9 @@ clean:
 debug:
 	$(eval CCFLAGS=${CCFLAGS} -DAETEN_DEBUG)
 
-generator:
+generator: ${GEN}
+
+${GEN}:
 	./generator/export
 	./generator/for-each-macro
 
@@ -42,7 +46,7 @@ ${SRC_O}: ${HDR_O}
 # No way to disable warning "#pragma once in main file" which appends systematicaly on single header compilation
 ${BUILD}/%.h.o: %.h generator
 	@-mkdir --parent $$(dirname $@)
-	${CC} -c ${CCFLAGS} $< -Iapi -I${GENERATED}/api -o $@ 2>&1 | sed '/warning: #pragma once in main file/,+2d'
+	${CC} -c ${CCFLAGS} $< -Iapi -I${GENERATED}/api -o $@
 
 ${BUILD}/%.o: %.c ${HDR}
 	@-mkdir --parent $$(dirname $@)

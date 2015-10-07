@@ -5,9 +5,20 @@ ARGC_MAX=$(eval echo \${ARGC_MAX_${STD}})
 
 GENERATED=generated
 MACRO=api/aeten/lang/FOR_EACH.h
+
+list=false
+while [ ${#} -ne 0 ]; do
+	case "${1}" in
+		-l|--list-files) list=true;;
+	esac
+	shift
+done
+
+${list} && { echo ${GENERATED}/${MACRO}; exit 0; }
+
 mkdir -p $(dirname ${GENERATED}/${MACRO})
 
-cat - << EOF > ${GENERATED}/${MACRO}
+cat - << EOF > ${GENERATED}/${MACRO}.generated
 #ifndef AETEN_MACROS
 #define AETEN_MACROS
 
@@ -46,3 +57,14 @@ $(for i in $(seq 2 ${ARGC_MAX}); do echo '#define _'${i}'_AETEN_FOR_EACH_I(what,
 
 #endif
 EOF
+
+sha() {
+	sha1sum $1|sed 's/\s.*//'
+}
+if [ -f "${GENERATED}/${MACRO}" ]; then
+	if [ "$(sha ${GENERATED}/${MACRO})" = "$(sha ${GENERATED}/${MACRO}.generated)" ]; then
+		rm ${GENERATED}/${MACRO}.generated
+		exit 0
+	fi
+fi
+mv ${GENERATED}/${MACRO}.generated ${GENERATED}/${MACRO}

@@ -2,6 +2,14 @@
 
 GENERATED=generated
 
+list=false
+while [ ${#} -ne 0 ]; do
+	case "${1}" in
+		-l|--list-files) list=true;;
+	esac
+	shift
+done
+
 find_packages() {
 	local package
 	{
@@ -62,24 +70,46 @@ export_implementation() {
 		s/^\s*[a-zA-Z][a-zA-Z0-9_]*\s*\**\s*\('${PACKAGE_NAME}'__\([A-Z][a-zA-Z0-9_]*\)\).*$/#\t\tdefine \2'"${SPACE}"'\1/p' ${INPUT_FILE}|sort -u
 }
 
+
+sha() {
+	sha1sum $1|sed 's/\s.*//'
+}
+
+check_new() {
+	if [ -f "$1" ]; then
+		if [ "$(sha $1)" = "$(sha ${1}.generated)" ]; then
+			rm ${1}.generated
+			return
+		fi
+	fi
+	mv ${1}.generated $1
+}
+
 for PACKAGE in $(find_packages); do
 	EXPORT=${GENERATED}/api/${PACKAGE}/export.h
 	IMPORT=${GENERATED}/api/${PACKAGE}/import.h
+	[ -f "api/${PACKAGE}.h" ] || continue
+	if ${list}; then
+		echo ${EXPORT}
+		echo ${IMPORT}
+		continue
+	fi
 	mkdir -p ${GENERATED}/api/${PACKAGE}
 	PACKAGE_NAME=$(echo ${PACKAGE}|tr / _)
-		cat - << EOF > ${IMPORT}
+		cat - << EOF > ${IMPORT}.generated
 #define _${PACKAGE_NAME}_IMPORT
 #  include "${PACKAGE}.h"
 #undef _${PACKAGE_NAME}_IMPORT
 EOF
-		cat - << EOF > ${EXPORT}
+	check_new ${IMPORT}
+
+		cat - << EOF > ${EXPORT}.generated
 #ifndef _${PACKAGE_NAME}_EXPORT_H
 #	define _${PACKAGE_NAME}_EXPORT_H
 #	ifdef _${PACKAGE_NAME}_IMPORT
 EOF
-
 	for INPUT_FILE in $(find_class_headers api/${PACKAGE}); do
-		cat - << EOF >> ${EXPORT}
+		cat - << EOF >> ${EXPORT}.generated
 
 /* From ${INPUT_FILE} */
 $(export_typedef api/${INPUT_FILE} ${PACKAGE_NAME})
@@ -87,11 +117,12 @@ $(export_macros api/${INPUT_FILE} ${PACKAGE_NAME})
 $(export_interface api/${INPUT_FILE} ${PACKAGE_NAME})
 $(export_implementation api/${INPUT_FILE} ${PACKAGE_NAME})
 EOF
-
 	done
-		cat - << EOF >> ${EXPORT}
+		cat - << EOF >> ${EXPORT}.generated
 
 #	endif
 #endif
 EOF
+	check_new ${EXPORT}
 done
+
