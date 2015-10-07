@@ -1,18 +1,18 @@
-#include "aeten/lang/Exception.h"
+#include "aeten/lang/Throwable.h"
 #include "aeten/lang/ArrayList.h"
 
-__thread aeten_lang__Exception* _aeten_lang__thrown_exception = NULL;
+__thread aeten_lang__Throwable* _aeten_lang__thrown_exception = NULL;
 __thread aeten_lang__List* _aeten_lang__handled_exceptions = NULL;
 
-aeten_lang__Exception* aeten_lang__Exception__get_thrown() {
+aeten_lang__Throwable* aeten_lang__Throwable__get_thrown() {
 	return _aeten_lang__thrown_exception;
 }
 
-void aeten_lang__Exception__handle(aeten_lang__handled_exception_t* handled_exception) {
+void aeten_lang__Throwable__handle(aeten_lang__handled_exception_t* handled_exception) {
 	_aeten_lang__handled_exceptions->add(_aeten_lang__handled_exceptions, &handled_exception); \
 }
 
-void aeten_lang__Exception__throw(aeten_lang__Exception* exception) {
+void aeten_lang__Throwable__throw(aeten_lang__Throwable* exception) {
 	int i;
 	_aeten_lang__thrown_exception = exception;
 	for (i=0; i<_aeten_lang__handled_exceptions->size(_aeten_lang__handled_exceptions); ++i) {
@@ -23,7 +23,7 @@ void aeten_lang__Exception__throw(aeten_lang__Exception* exception) {
 	}
 }
 
-void  aeten_lang__Exception__reset() {
+void  aeten_lang__Throwable__reset() {
 	_aeten_lang__thrown_exception = NULL;
 	if (_aeten_lang__handled_exceptions) aeten_lang__delete(_aeten_lang__handled_exceptions);
 	_aeten_lang__handled_exceptions = aeten_lang__ArrayList__new(sizeof(aeten_lang__handled_exception_t*), 1);

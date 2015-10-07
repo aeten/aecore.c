@@ -3,7 +3,7 @@
 #include "aeten/lang/import.h"
 #include "aeten/lang/CopyOnWriteArrayList.h"
 #include "aeten/lang/ArrayList.h"
-#include "aeten/lang/Exception.h"
+#include "aeten/lang/Throwable.h"
 #include "aeten/lang/IndexOutOfBoundException.h"
 
 
@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
 			printf("Value of list[%d]=%d\n", i, value);
 		}
 	} aeten_lang__catch(aeten_lang__IndexOutOfBoundException, exception) {
-		exception->print_message((aeten_lang__Exception*)exception);
+		exception->print_message((aeten_lang__Throwable*)exception);
 	} aeten_lang__finally() {
 		printf("Finally\n");
 	}

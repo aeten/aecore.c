@@ -1,4 +1,4 @@
-#include "aeten/lang/Exception.h"
+#include "aeten/lang/Throwable.h"
 #include "aeten/lang/IndexOutOfBoundException.h"
 
 #define AETEN_LANG_IMPLEMENTATION_C

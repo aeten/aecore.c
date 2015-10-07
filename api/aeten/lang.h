@@ -168,19 +168,19 @@ static char* _aeten_debug_tmp_str = 0;
 	aeten_lang__catch_t _catch_block_; \
 	aeten_lang__List* _handled_exceptions_ = aeten_lang__ArrayList__new(sizeof(aeten_lang__handled_exception_t), 1); \
 	aeten_lang__handled_exception_t* _handled_exception_ref_ = NULL; \
-	aeten_lang__Exception__reset(); \
+	aeten_lang__Throwable__reset(); \
 	aeten_lang__Closable* _try_resources_[] = { __VA_ARGS__ } ; \
 	size_t _try_resources_size_ = AETEN_FOR_EACH_NARG(__VA_ARGS__); \
 	void _finally_block_ () { \
 		for (_try_resource_=0; _try_resource_<_try_resources_size_; ++_try_resource_) { \
 			if(_try_resources_[_try_resource_]!=NULL) _try_resources_[_try_resource_]->close(_try_resources_[_try_resource_]); \
 		} \
-		if (!_catched_ && aeten_lang__Exception__get_thrown()) { \
-			aeten_lang__Exception* _error_ = aeten_lang__Exception__get_thrown(); \
+		if (!_catched_ && aeten_lang__Throwable__get_thrown()) { \
+			aeten_lang__Throwable* _error_ = aeten_lang__Throwable__get_thrown(); \
 			_error_->print_message(_error_); \
 			raise(SIGABRT); \
 		} ;\
-		aeten_lang__Exception__reset(); \
+		aeten_lang__Throwable__reset(); \
 	} \
 	{ \
 		_try_block_ = ({ void _aeten_lang__block_ ()
@@ -190,7 +190,7 @@ static char* _aeten_debug_tmp_str = 0;
 		}); \
 		if (_handled_exception_ref_) { \
 			_handled_exception_ref_->catch_block = (aeten_lang__catch_t)({ \
-				void _aeten_lang__block_ (aeten_lang__Exception* exception) { \
+				void _aeten_lang__block_ (aeten_lang__Throwable* exception) { \
 					_catch_block_(exception); \
 					_catched_ = 1; \
 					goto _finally_; \
@@ -202,7 +202,7 @@ static char* _aeten_debug_tmp_str = 0;
 		aeten_lang__handled_exception_t _handled_exception_; \
 		_handled_exceptions_->add(_handled_exceptions_, &_handled_exception_); \
 		_handled_exception_ref_ = _handled_exceptions_->get(_handled_exceptions_, _handled_exception_index_++); \
-		aeten_lang__Exception__handle(_handled_exception_ref_); \
+		aeten_lang__Throwable__handle(_handled_exception_ref_); \
 		_handled_exception_ref_->exception = #exception_interface; \
 		_catch_block_ =  (aeten_lang__catch_t)({ \
 			void _aeten_lang__block_ (exception_interface* exception) \
@@ -211,7 +211,7 @@ static char* _aeten_debug_tmp_str = 0;
 			_aeten_lang__block_; \
 		}); \
 		_handled_exception_ref_->catch_block = (aeten_lang__catch_t)({ \
-			void _aeten_lang__block_ (aeten_lang__Exception* exception) { \
+			void _aeten_lang__block_ (aeten_lang__Throwable* exception) { \
 				_catch_block_(exception); \
 				_catched_ = 1; \
 				goto _finally_; \
@@ -231,7 +231,7 @@ static char* _aeten_debug_tmp_str = 0;
 		if (!(expression)) { \
 			char* message = aeten_lang__string_from_format(message_format, ##__VA_ARGS__); \
 			char* prefixed_message = aeten_lang__string_from_format("%s +%u: Check (%s): %s (%s)", __func__, __LINE__, #expression, #exception, message); \
-			aeten_lang__Exception__throw(exception##__new(prefixed_message)); \
+			aeten_lang__Throwable__throw(exception##__new(prefixed_message)); \
 			free(message); \
 			free(prefixed_message); \
 		} \

@@ -1,5 +1,5 @@
 #include "aeten/lang/ArrayList.h"
-#include "aeten/lang/Exception.h"
+#include "aeten/lang/Throwable.h"
 #include "aeten/lang.h"
 
 aeten_lang__ArrayList* _aeten_lang__interfaces = NULL;
