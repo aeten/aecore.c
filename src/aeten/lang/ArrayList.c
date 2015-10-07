@@ -25,7 +25,7 @@ void aeten_lang__ArrayList__finalize(aeten_lang__ArrayList *list) {
 void aeten_lang__ArrayList__set(aeten_lang__List *list, unsigned int position, void *element) {
 	aeten_lang__ArrayList *array_list = aeten_lang__cast_ref(aeten_lang__ArrayList, list);
 	if(position >= array_list->_private.size) {
-		// TODO: throw error
+		aeten_lang__check(position < array_list->_private.size, aeten_lang__IndexOutOfBoundException, "position=%u; array.length=%u", position, array_list->_private.size);
 	}
 	unsigned long pointer = (unsigned long)array_list->_private.elements;
 	pointer += position*array_list->_private.element_size;
@@ -49,7 +49,7 @@ void aeten_lang__ArrayList__add(aeten_lang__List *list, void *element) {
 void* aeten_lang__ArrayList__get(aeten_lang__List *list, unsigned int position) {
 	aeten_lang__ArrayList *array_list = aeten_lang__cast_ref(aeten_lang__ArrayList, list);
 	if(position >= array_list->_private.size) {
-		// TODO: throw error
+		aeten_lang__check(position < array_list->_private.size, aeten_lang__IndexOutOfBoundException, "position=%u; array.length=%u", position, array_list->_private.size);
 	}
 	unsigned long pointer = (unsigned long)array_list->_private.elements;
 	pointer += position*array_list->_private.element_size;

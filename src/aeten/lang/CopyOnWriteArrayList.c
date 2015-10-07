@@ -17,7 +17,7 @@ void aeten_lang__CopyOnWriteArrayList__finalize(aeten_lang__CopyOnWriteArrayList
 void aeten_lang__CopyOnWriteArrayList__set(aeten_lang__List *list, unsigned int position, void *element) {
 	aeten_lang__array_t array = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.array;
 	if(position >= array.length) {
-		// TODO: throw error
+		aeten_lang__check(position < array.length, aeten_lang__IndexOutOfBoundException, "position=%u; array.length=%u", position, array.length);
 	}
 	unsigned long pointer = (unsigned long)array.elements;
 	pointer += position*array.element_size;
@@ -27,7 +27,7 @@ void aeten_lang__CopyOnWriteArrayList__set(aeten_lang__List *list, unsigned int 
 void * aeten_lang__CopyOnWriteArrayList__get(aeten_lang__List *list, unsigned int position) {
 	aeten_lang__array_t array = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.array;
 	if(position >= array.length) {
-		// TODO: throw error
+		aeten_lang__check(position < array.length, aeten_lang__IndexOutOfBoundException, "position=%u; array.length=%u", position, array.length);
 	}
 	unsigned long pointer = (unsigned long)array.elements;
 	pointer += position*array.element_size;

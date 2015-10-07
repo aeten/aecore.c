@@ -42,7 +42,6 @@ void print_parents(const char* interface, int level) {
 
 int main(int argc, char **argv) {
 	int i, value;
-	size_t size;
 //	List* list = aeten_lang__CopyOnWriteArrayList__new(sizeof(int));
 	List* list = aeten_lang__ArrayList__new(sizeof(int), 5);
 	for (i=0; i<10; ++i) {
@@ -50,10 +49,16 @@ int main(int argc, char **argv) {
 	}
 
 	print_parents(list->_interface, 0);
-	size = list->size(list);
-	for (i=0; i<size; ++i) {
-		value = *(int*)list->get(list, i);
-		printf("Value of list[%d]=%d\n", i, value);
+	aeten_lang__try() {
+		size_t size = list->size(list);
+		for (i=0; i<size; ++i) {
+			value = *(int*)list->get(list, i+8);
+			printf("Value of list[%d]=%d\n", i, value);
+		}
+	} aeten_lang__catch(aeten_lang__IndexOutOfBoundException, exception) {
+		exception->print_message((aeten_lang__Exception*)exception);
+	} aeten_lang__finally() {
+		printf("Finally\n");
 	}
 	aeten_lang__delete(list);
 	return 0;

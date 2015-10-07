@@ -158,6 +158,86 @@ static char* _aeten_debug_tmp_str = 0;
 	ref->method(ref, ##__VA_ARGS__); \
 })
 
+/** Start a try block whith potentially aeten_lang__Closable resources */
+#define aeten_lang__try(...) { \
+	__label__ _finally_;\
+	unsigned int _handled_exception_index_ = 0; \
+	unsigned int _try_resource_; \
+	int _catched_ = 0; \
+	aeten_lang__try_t _try_block_; \
+	aeten_lang__catch_t _catch_block_; \
+	aeten_lang__List* _handled_exceptions_ = aeten_lang__ArrayList__new(sizeof(aeten_lang__handled_exception_t), 1); \
+	aeten_lang__handled_exception_t* _handled_exception_ref_ = NULL; \
+	aeten_lang__Exception__reset(); \
+	aeten_lang__Closable* _try_resources_[] = { __VA_ARGS__ } ; \
+	size_t _try_resources_size_ = AETEN_FOR_EACH_NARG(__VA_ARGS__); \
+	void _finally_block_ () { \
+		for (_try_resource_=0; _try_resource_<_try_resources_size_; ++_try_resource_) { \
+			if(_try_resources_[_try_resource_]!=NULL) _try_resources_[_try_resource_]->close(_try_resources_[_try_resource_]); \
+		} \
+		if (!_catched_ && aeten_lang__Exception__get_thrown()) { \
+			aeten_lang__Exception* _error_ = aeten_lang__Exception__get_thrown(); \
+			_error_->print_message(_error_); \
+			raise(SIGABRT); \
+		} ;\
+		aeten_lang__Exception__reset(); \
+	} \
+	{ \
+		_try_block_ = ({ void _aeten_lang__block_ ()
+
+#define aeten_lang__catch(exception_interface, _exception_) \
+			_aeten_lang__block_; \
+		}); \
+		if (_handled_exception_ref_) { \
+			_handled_exception_ref_->catch_block = (aeten_lang__catch_t)({ \
+				void _aeten_lang__block_ (aeten_lang__Exception* exception) { \
+					_catch_block_(exception); \
+					_catched_ = 1; \
+					goto _finally_; \
+				} _aeten_lang__block_; \
+			});\
+		} \
+	} \
+	{ \
+		aeten_lang__handled_exception_t _handled_exception_; \
+		_handled_exceptions_->add(_handled_exceptions_, &_handled_exception_); \
+		_handled_exception_ref_ = _handled_exceptions_->get(_handled_exceptions_, _handled_exception_index_++); \
+		aeten_lang__Exception__handle(_handled_exception_ref_); \
+		_handled_exception_ref_->exception = #exception_interface; \
+		_catch_block_ =  (aeten_lang__catch_t)({ \
+			void _aeten_lang__block_ (exception_interface* exception) \
+
+#define aeten_lang__finally(finally_block) \
+			_aeten_lang__block_; \
+		}); \
+		_handled_exception_ref_->catch_block = (aeten_lang__catch_t)({ \
+			void _aeten_lang__block_ (aeten_lang__Exception* exception) { \
+				_catch_block_(exception); \
+				_catched_ = 1; \
+				goto _finally_; \
+			} _aeten_lang__block_; \
+		});\
+	} \
+	_try_block_(); \
+	_finally_: _finally_block_(); \
+	finally_block; \
+}
+
+
+/** Check expression or throws exception (TODO) */
+// TODO: goto aeten_lang__catch__##exception;
+#define aeten_lang__check(expression, exception, message_format, ...) \
+	do { \
+		if (!(expression)) { \
+			char* message = aeten_lang__string_from_format(message_format, ##__VA_ARGS__); \
+			char* prefixed_message = aeten_lang__string_from_format("%s +%u: Check (%s): %s (%s)", __func__, __LINE__, #expression, #exception, message); \
+			aeten_lang__Exception__throw(exception##__new(prefixed_message)); \
+			free(message); \
+			free(prefixed_message); \
+		} \
+	} while (0);
+
+
 // TODO: check instance interfaces before
 #define aeten_lang__cast_ref(type, object_ref) ((type*) object_ref)
 
