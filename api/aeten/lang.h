@@ -1,6 +1,10 @@
 
 #ifndef _AETEN_LANG_H
 #define _AETEN_LANG_H
+#if !defined(__GNUC__) || (__GNUC__ < 4)
+#error "Æten lang requires GCC >= 4"
+#endif
+
 #ifdef _aeten_lang_IMPORT
 #include "aeten/lang/export.h"
 #endif
@@ -99,8 +103,8 @@ aeten_lang__interface_t* aeten_lang__get_interface(const char* iface_name);
 #	include<stdio.h>
 #	include <assert.h>
 #	undef AETEN_DEBUG
-static char* _aeten_debug_tmp_str = 0;
 #	define AETEN_DEBUG(format, ...) do { \
+		static char* _aeten_debug_tmp_str = 0; \
 		fprintf(stderr, "%s +%d: " format "\n", __FILE__, __LINE__, __VA_ARGS__); \
 		if (_aeten_debug_tmp_str) { \
 			free(_aeten_debug_tmp_str); \
@@ -116,32 +120,8 @@ static char* _aeten_debug_tmp_str = 0;
 #	define AETEN_DEBUG_ASSERT(...)
 #endif
 
-#if defined(__GNUC__)
-#	define aeten_lang__static_constructor(fn) \
-	static void fn(void) __attribute__((constructor)); \
-	static void fn(void)
-#elif defined(_MSC_VER)
-#	define aeten_lang__static_constructor(fn) \
-	static void __cdecl fn(void); \
-	__declspec(allocate(".CRT$XCU")) void (__cdecl *fn##_)(void) = fn; \
-	static void __cdecl fn(void)
-#endif
-
-#if defined(aeten_lang__static_constructor) && !defined(_aeten_lang__destructor)
-#	define _aeten_lang__destructor(fn) \
-	static void fn(void);\
-	aeten_lang__static_constructor(_aeten_lang__destructor_##fn) { \
-		atexit( fn ); \
-	} \
-	static void fn(void)
-#endif
-
 #define aeten_lang__type_of(a) \
 	((aeten_lang__type_t) { #a, sizeof(a) })
-
-#define aeten_lang__init(iface, ...) \
-	iface AETEN_FIRST_ARG(__VA_ARGS__); \
-	iface##__init(&__VA_ARGS__);
 
 #define aeten_lang__delete(object) do { \
 		object->_finalize((aeten_lang__interface_t*)object); \
@@ -169,17 +149,19 @@ static char* _aeten_debug_tmp_str = 0;
 #define _aeten_lang__define_type(iface, ...) \
 	typedef struct _##iface##_st iface; \
 	aeten_lang__interface_t _##iface##_i; \
-	aeten_lang__static_constructor(_##iface##_c) { \
+	static void _##iface##_c(void) __attribute__((constructor)) ; \
+	static void _##iface##_c(void) { \
 		_aeten_lang__construct(&_##iface##_i, #iface, (aeten_lang__interface_t*[]) { \
 			AETEN_FOR_EACH(_AETEN_REF_OF_EACH_IFACE, ##__VA_ARGS__) (aeten_lang__interface_t*)NULL \
 		}); \
 	} \
-	_aeten_lang__destructor(_##iface##_d) { \
+	static void _##iface##_d(void) __attribute__((destructor)); \
+	static void _##iface##_d(void) { \
 		aeten_lang__delete(_##iface##_i.methods); \
 	}
 
-void _aeten_lang__init();
-aeten_lang__static_constructor(_aeten_lang__interfaces_c) {
+void _aeten_lang__init(void);
+__attribute__((constructor)) static void _aeten_lang__init_c(void) {
 	_aeten_lang__init();
 }
 

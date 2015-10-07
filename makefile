@@ -2,7 +2,11 @@ SHELL=sh
 GENERATED=generated
 BUILD=build
 CC=gcc
-CCFLAGS=-g -O0 -fPIC #-Wall -Wextra -Wmissing-prototypes -Wstrict-prototypes -Wold-style-definition
+STANDARD=gnu99
+CCWARNING=old-style-definition strict-prototypes missing-prototypes all extra
+OPTIMITATION=0
+
+CCFLAGS=-g -O${OPTIMITATION} -fPIC -std=${STANDARD} $(addprefix -W,${CCWARNING})
 
 NAME=$(notdir $(realpath $(dir $MAKEFILE)))
 VERSION=$(shell { git describe --tags --match='[0-9]*\.[0-9]*' --dirty=+ 2>/dev/null || echo g$$(git describe --always --dirty=+); } | sed 's@.*/@@')
@@ -43,7 +47,6 @@ ${GEN}:
 
 ${SRC_O}: ${HDR_O}
 
-# No way to disable warning "#pragma once in main file" which appends systematicaly on single header compilation
 ${BUILD}/%.h.o: %.h generator
 	@-mkdir --parent $$(dirname $@)
 	${CC} -c ${CCFLAGS} $< -Iapi -I${GENERATED}/api -o $@

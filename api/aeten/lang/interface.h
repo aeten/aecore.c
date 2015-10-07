@@ -21,7 +21,8 @@ AETEN_LANG_INTERFACE
 /* {{{ Method definition */
 #	define aeten_lang__method(type, nm, ...) \
 		typedef type (*_AETEN_LANG_IFACE(_, __##nm##_t))(AETEN_LANG_INTERFACE*, ##__VA_ARGS__); \
-		aeten_lang__static_constructor(_AETEN_LANG_IFACE(_, __##nm##_constr)) { \
+		static void (_AETEN_LANG_IFACE(_, __##nm##_constr))(void) __attribute__((constructor)); \
+		static void (_AETEN_LANG_IFACE(_, __##nm##_constr))(void) { \
 			char *types[] = AETEN_STRING_OF_EACH(type, ##__VA_ARGS__); \
 			size_t sizes[] = AETEN_SIZE_OF_EACH(type, ##__VA_ARGS__); \
 			_aeten_lang__method_construct(&_AETEN_LANG_IFACE(_, _i), #nm,  types, sizes); \
@@ -41,9 +42,6 @@ AETEN_LANG_INTERFACE
 
 #	endif// Methods
 
-#define _aeten_lang__message(...) _aeten_lang__message_1(__VA_ARGS__)
-#define _aeten_lang__message_1(...) _aeten_lang__message_2(message #__VA_ARGS__)
-#define _aeten_lang__message_2(msg) _Pragma(#msg)
 #ifndef AETEN_LANG_IMPLEMENTATION_H
 	#undef AETEN_LANG_METHODS
 	#undef AETEN_LANG_INTERFACE

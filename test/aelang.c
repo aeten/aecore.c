@@ -7,7 +7,10 @@
 #include "aeten/lang/IndexOutOfBoundException.h"
 
 
-void print_methods(interface_t *interface, int level) {
+void print_methods(interface_t *interface, unsigned int level);
+void print_parents(const char* interface, unsigned int level);
+
+void print_methods(interface_t *interface, unsigned int level) {
 	unsigned int i, mtd_i, arg_i, mtd_size, sign_size;
 	type_t *type;
 	mtd_size = call(interface->methods, size);
@@ -19,18 +22,18 @@ void print_methods(interface_t *interface, int level) {
 		sign_size = call(method->signature, size);
 		for (arg_i=1; arg_i<sign_size; ++arg_i) {
 			type = call(method->signature, get, arg_i);
-			printf("%s%s /%u/", (arg_i==1)? "": ", ", type->name, type->size);
+			printf("%s%s /%lu/", (arg_i==1)? "": ", ", type->name, type->size);
 		}
 		type = call(method->signature, get, 0);
-		printf("): %s /%u/", type->name, type->size);
+		printf("): %s /%lu/", type->name, type->size);
 	}
 }
 
-void print_parents(const char* interface, int level) {
-	int i;
+void print_parents(const char* interface, unsigned int level) {
+	unsigned int i;
 	for (i=0; i<level; ++i) printf("\t");
 	interface_t* iface = aeten_lang__get_interface(interface);
-	printf("%s(%x) {", interface, iface);
+	printf("%s(%lx) {", interface, (unsigned long int)iface);
 	print_methods(iface, level);
 	printf("\n");
 	for (i=0; i<call(iface->parents, size); ++i) {
@@ -40,8 +43,10 @@ void print_parents(const char* interface, int level) {
 	printf("}\n");
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 int main(int argc, char **argv) {
-	int i, value;
+	unsigned int i, value;
 //	List* list = aeten_lang__CopyOnWriteArrayList__new(sizeof(int));
 	List* list = aeten_lang__ArrayList__new(sizeof(int), 5);
 	for (i=0; i<10; ++i) {
@@ -63,3 +68,4 @@ int main(int argc, char **argv) {
 	aeten_lang__delete(list);
 	return 0;
 }
+#pragma GCC diagnostic pop

@@ -3,55 +3,58 @@
 #include "aeten/lang/IndexOutOfBoundException.h"
 
 aeten_lang__List * aeten_lang__CopyOnWriteArrayList__initialize(aeten_lang__CopyOnWriteArrayList *list, size_t element_size) {
-	aeten_lang__array_t array = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.array;
-	array.elements = NULL;
-	array.length = 0;
-	array.element_size = element_size;
+	volatile aeten_lang__array_t* array = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.array;
+	array->elements = NULL;
+	array->length = 0;
+	array->element_size = element_size;
 	return aeten_lang__cast_ref(aeten_lang__List, list);
 }
 
 void aeten_lang__CopyOnWriteArrayList__finalize(aeten_lang__CopyOnWriteArrayList *list) {
-	free(list->_private.array.elements);
+	free(list->_private.array->elements);
+	free(list->_private.array);
 }
 
 void aeten_lang__CopyOnWriteArrayList__set(aeten_lang__List *list, unsigned int position, void *element) {
-	aeten_lang__array_t array = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.array;
-	if(position >= array.length) {
-		aeten_lang__check(position < array.length, aeten_lang__IndexOutOfBoundException, "position=%u; array.length=%u", position, array.length);
+	aeten_lang__array_t* array = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.array;
+	if(position >= array->length) {
+		aeten_lang__check(position < array->length, aeten_lang__IndexOutOfBoundException, "position=%u; array.length=%u", position, array->length);
 	}
-	unsigned long pointer = (unsigned long)array.elements;
-	pointer += position*array.element_size;
-	memcpy((void*)pointer, element, array.element_size);
+	unsigned long pointer = (unsigned long)array->elements;
+	pointer += position*array->element_size;
+	memcpy((void*)pointer, element, array->element_size);
 }
 
 void * aeten_lang__CopyOnWriteArrayList__get(aeten_lang__List *list, unsigned int position) {
-	aeten_lang__array_t array = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.array;
-	if(position >= array.length) {
-		aeten_lang__check(position < array.length, aeten_lang__IndexOutOfBoundException, "position=%u; array.length=%u", position, array.length);
+	volatile aeten_lang__array_t* array = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.array;
+	if(position >= array->length) {
+		aeten_lang__check(position < array->length, aeten_lang__IndexOutOfBoundException, "position=%u; array.length=%u", position, array->length);
 	}
-	unsigned long pointer = (unsigned long)array.elements;
-	pointer += position*array.element_size;
+	unsigned long pointer = (unsigned long)array->elements;
+	pointer += position*array->element_size;
 	return (void*)pointer;
 }
 
 void aeten_lang__CopyOnWriteArrayList__add(aeten_lang__List *list, void *element) {
 	aeten_lang__CopyOnWriteArrayList* cow_list = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list);
-	aeten_lang__array_t array = cow_list->_private.array;
-	aeten_lang__array_t new_array;
-	memcpy(&new_array, &array, sizeof(array));
-	new_array.length++;
-	new_array.elements = malloc(new_array.element_size * new_array.length);
-	if (array.length>0) {
-		memcpy(new_array.elements, array.elements, array.element_size * array.length);
+	aeten_lang__array_t* volatile array = cow_list->_private.array;
+	aeten_lang__array_t* volatile new_array =  (aeten_lang__array_t*)calloc(1, sizeof(aeten_lang__array_t));
+	new_array->length++;
+	new_array->elements = malloc(new_array->element_size * new_array->length);
+	if (array->length>0) {
+		memcpy(new_array->elements, array->elements, array->element_size * array->length);
 	}
 
-	unsigned long pointer = (unsigned long)new_array.elements;
-	pointer += new_array.length-1 * new_array.element_size;
-	memcpy((void*)pointer, element, new_array.element_size);
+	unsigned long pointer = (unsigned long)new_array->elements;
+	pointer += new_array->length-1 * new_array->element_size;
+	memcpy((void*)pointer, element, new_array->element_size);
 	cow_list->_private.array = new_array;
+
+	free(array->elements);
+	free(array);
 }
 
 size_t aeten_lang__CopyOnWriteArrayList__size(aeten_lang__List *list) {
-	return aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.array.length;
+	return aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.array->length;
 }
 

@@ -2,9 +2,11 @@
 #include "aeten/lang/Throwable.h"
 #include "aeten/lang.h"
 
+/* TODO: Use a Map when will be implemented */
 aeten_lang__ArrayList* _aeten_lang__interfaces = NULL;
 
-void _aeten_lang__init() {
+
+void _aeten_lang__init(void) {
 	if (!_aeten_lang__interfaces) {
 		_aeten_lang__interfaces = calloc(1, sizeof(aeten_lang__ArrayList));
 		_aeten_lang__ArrayList__init(_aeten_lang__interfaces, sizeof(aeten_lang__interface_t), 20);
@@ -31,10 +33,10 @@ void _aeten_lang__construct(aeten_lang__interface_t *iface, char const *iface_na
 	if (aeten_lang__get_interface(iface_name)) return;
 	for (size=0; ifc_list[size] ; ++size) { }
 	iface->name = iface_name;
-	AETEN_DEBUG("Register %s(%x) size=%u", iface->name, iface, size);
+	AETEN_DEBUG("Register %s(%lx) size=%lu", iface->name, (unsigned long int)iface, size);
 	iface->parents = (aeten_lang__ParentsList*)aeten_lang__ArrayList__new(sizeof(aeten_lang__interface_t), size);
 	for (i=0; i < size && ifc_list[i]; ++i) {
-		AETEN_DEBUG("\t%s(%x) inherits from %s(%x)", iface->name, iface, ifc_list[i]->name, ifc_list[i]);
+		AETEN_DEBUG("\t%s(%lx) inherits from %s(%lx)", iface->name, (unsigned long int)iface, ifc_list[i]->name, (unsigned long int)ifc_list[i]);
 		aeten_lang__cast_and_call(iface->parents, aeten_lang__List, add, ifc_list[i]);
 	}
 	iface->methods = (aeten_lang__MethodsList*)aeten_lang__ArrayList__new(sizeof(aeten_lang__method_definition_t), 0);
@@ -42,12 +44,11 @@ void _aeten_lang__construct(aeten_lang__interface_t *iface, char const *iface_na
 }
 
 char *_aeten_lang__join_strings(char *dest, char* src[], char join) {
-	int size, length, i, offset;
+	int size, i, offset;
 	char* c;
 	for (size=0, i=0; src[i]; i++) {
 		 size+=(strlen(src[i]+1));
 	}
-	length = i;
 	if (0==dest) dest = malloc(size*sizeof(char)+1);
 	for (i=0, offset=0; src[i]; ++i, ++offset) {
 		for(c=src[i]; *c; ++c, ++offset) {
@@ -60,14 +61,14 @@ char *_aeten_lang__join_strings(char *dest, char* src[], char join) {
 }
 
 void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *name, char *signature_types[], size_t signature_sizes[]) {
-	int i;
+	unsigned int i;
 	size_t size;
 	for (i=0; i<iface->methods->size(iface->methods); ++i) {
 		if (0==strcmp(name, ((aeten_lang__method_definition_t*)iface->methods->get(iface->methods, i))->name)) return;
 	}
 
 	for (size=0; signature_types[size]; ++size);
-	AETEN_DEBUG("Adds method %s.%s(%s): %s", iface->name, name, AETEN_DEBUG_JOIN_STRINGS(signature_types+1, ','), *signature_types, size);
+	AETEN_DEBUG("Adds method %s.%s(%s): %s", iface->name, name, AETEN_DEBUG_JOIN_STRINGS(signature_types+1, ','), *signature_types);
 
 	aeten_lang__method_definition_t method = {
 		iface,

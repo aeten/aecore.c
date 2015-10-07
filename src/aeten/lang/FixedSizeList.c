@@ -32,9 +32,12 @@ void * aeten_lang__FixedSizeList__get(aeten_lang__List *list, unsigned int posit
 	return (void*)pointer;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 void aeten_lang__FixedSizeList__add(aeten_lang__List *list, void *element) {
 	// TODO: throw unsupported exception
 }
+#pragma GCC diagnostic pop
 
 size_t aeten_lang__FixedSizeList__size(aeten_lang__List *list) {
 	return aeten_lang__cast_ref(aeten_lang__FixedSizeList, list)->_private.length;

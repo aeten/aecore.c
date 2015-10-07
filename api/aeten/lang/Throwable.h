@@ -15,18 +15,18 @@
 
 #include "aeten/lang/interface.h"
 
-typedef void   (*aeten_lang__try_t)   ();
+typedef void   (*aeten_lang__try_t)   (void);
 typedef void   (*aeten_lang__catch_t) (aeten_lang__Throwable* exception);
-typedef void   (*aeten_lang__finally_t)   ();
+typedef void   (*aeten_lang__finally_t)   (void);
 typedef struct aeten_lang__handles_exception_st {
 	char* exception;
 	aeten_lang__catch_t catch_block;
 } aeten_lang__handled_exception_t;
 
-aeten_lang__Throwable* aeten_lang__Throwable__get_thrown();
+aeten_lang__Throwable* aeten_lang__Throwable__get_thrown(void);
 void aeten_lang__Throwable__handle(aeten_lang__handled_exception_t* handled_exception);
 void aeten_lang__Throwable__throw(aeten_lang__Throwable*);
-void aeten_lang__Throwable__reset();
+void aeten_lang__Throwable__reset(void);
 
 
 
@@ -43,7 +43,7 @@ void aeten_lang__Throwable__reset();
 	aeten_lang__Throwable__reset(); \
 	aeten_lang__Closable* _try_resources_[] = { __VA_ARGS__ } ; \
 	size_t _try_resources_size_ = AETEN_FOR_EACH_NARG(__VA_ARGS__); \
-	void _finally_block_ () { \
+	void _finally_block_ (void) { \
 		for (_try_resource_=0; _try_resource_<_try_resources_size_; ++_try_resource_) { \
 			if(_try_resources_[_try_resource_]!=NULL) _try_resources_[_try_resource_]->close(_try_resources_[_try_resource_]); \
 		} \
@@ -55,7 +55,7 @@ void aeten_lang__Throwable__reset();
 		aeten_lang__Throwable__reset(); \
 	} \
 	{ \
-		_try_block_ = ({ void _aeten_lang__block_ ()
+		_try_block_ = ({ void _aeten_lang__block_ (void)
 
 #define aeten_lang__catch(exception_interface, _exception_) \
 			_aeten_lang__block_; \

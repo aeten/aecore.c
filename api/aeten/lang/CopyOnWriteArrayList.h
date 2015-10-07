@@ -8,7 +8,7 @@
 	aeten_lang__implementation(aeten_lang__CopyOnWriteArrayList, aeten_lang__List)
 
 #define AETEN_LANG_PRIVATE \
-	aeten_lang__private(volatile aeten_lang__array_t array)
+	aeten_lang__private(aeten_lang__array_t* volatile array)
 
 #define AETEN_LANG_CONSTRUCTORS \
 	aeten_lang__constructor(size_t /*element_size*/)
