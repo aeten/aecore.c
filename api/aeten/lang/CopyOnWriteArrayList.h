@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _AETEN_LANG_COW_H
+#define _AETEN_LANG_COW_H
 
 /**
  * Thread safe copy on write List implementation.
@@ -14,3 +15,5 @@
 
 #include "aeten/lang/List.h"
 #include "aeten/lang/implementation.h"
+
+#endif

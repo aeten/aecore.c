@@ -3,7 +3,6 @@
 #include "aeten/lang/IndexOutOfBoundException.h"
 
 aeten_lang__List * aeten_lang__CopyOnWriteArrayList__initialize(aeten_lang__CopyOnWriteArrayList *list, size_t element_size) {
-	_aeten_lang__CopyOnWriteArrayList__init(list);
 	aeten_lang__array_t array = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.array;
 	array.elements = NULL;
 	array.length = 0;
@@ -18,7 +17,7 @@ void aeten_lang__CopyOnWriteArrayList__finalize(aeten_lang__CopyOnWriteArrayList
 void aeten_lang__CopyOnWriteArrayList__set(aeten_lang__List *list, unsigned int position, void *element) {
 	aeten_lang__array_t array = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.array;
 	if(position >= array.length) {
-		aeten_lang__check(position < array.length, aeten_lang__IndexOutOfBoundException, "position=%u; array.length=%u", position, array.length);
+		// TODO: throw error
 	}
 	unsigned long pointer = (unsigned long)array.elements;
 	pointer += position*array.element_size;
@@ -28,7 +27,7 @@ void aeten_lang__CopyOnWriteArrayList__set(aeten_lang__List *list, unsigned int 
 void * aeten_lang__CopyOnWriteArrayList__get(aeten_lang__List *list, unsigned int position) {
 	aeten_lang__array_t array = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.array;
 	if(position >= array.length) {
-		aeten_lang__check(position < array.length, aeten_lang__IndexOutOfBoundException, "position=%u; array.length=%u", position, array.length);
+		// TODO: throw error
 	}
 	unsigned long pointer = (unsigned long)array.elements;
 	pointer += position*array.element_size;

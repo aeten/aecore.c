@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _AETEN_LANG_FSLIST_H
+#define _AETEN_LANG_FSLIST_H
 
 #include <stddef.h>
 
@@ -13,3 +14,5 @@
 
 #include "aeten/lang/List.h"
 #include "aeten/lang/implementation.h"
+
+#endif

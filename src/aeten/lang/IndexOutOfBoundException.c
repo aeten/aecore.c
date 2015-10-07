@@ -4,7 +4,6 @@
 #include <stdio.h>
 
 aeten_lang__Exception * aeten_lang__IndexOutOfBoundException__initialize(aeten_lang__IndexOutOfBoundException *exception, char* message) {
-	_aeten_lang__IndexOutOfBoundException__init(exception);
 	exception->_private.message = (char*)malloc(strlen(message)+1);
 	strcpy(exception->_private.message, message);
 	return aeten_lang__cast_ref(aeten_lang__Exception, exception);

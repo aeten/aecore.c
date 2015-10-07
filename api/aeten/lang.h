@@ -1,15 +1,16 @@
+
+#ifndef _AETEN_LANG_H
+#define _AETEN_LANG_H
 #ifdef _aeten_lang_IMPORT
 #include "aeten/lang/export.h"
 #endif
 
-#ifndef _AETEN_LANG_H
-#define _AETEN_LANG_H
 
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-#include "aeten/lang/String.h"
 
+#include "aeten/lang/String.h"
 #include "aeten/lang/FOR_EACH.h"
 
 typedef struct aeten_lang__interface_st             aeten_lang__interface_t;
@@ -39,8 +40,15 @@ struct aeten_lang__array_st {
 	void*  elements;
 };
 
+struct aeten_lang__interface_st {
+	char const *name;
+	aeten_lang__MethodsList* methods;
+	aeten_lang__ParentsList* parents;
+};
+
+
 #define _aeten_lang__object_header \
-	aeten_lang__interface_t   *_interface; \
+	char*                     _interface; \
 	aeten_lang__initializer_t _initialize; \
 	aeten_lang__finalizer_t   _finalize
 
@@ -67,12 +75,6 @@ struct aeten_lang__ParentsList_st {
 	aeten_lang__interface_t*  (*get) (aeten_lang__ParentsList*, unsigned int);
 };
 
-struct aeten_lang__interface_st {
-	char const *name;
-	aeten_lang__MethodsList* methods;
-	aeten_lang__ParentsList* parents;
-};
-
 
 struct aeten_lang__method_definition_st {
 	aeten_lang__interface_t const *interface;
@@ -88,6 +90,7 @@ struct aeten_lang__method_implementation_st {
 void _aeten_lang__construct(aeten_lang__interface_t *iface, char const *iface_name, aeten_lang__interface_t *ifc_list[]);
 char *_aeten_lang__join_strings(char *dest, char* src[], char join);
 void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *name, char *signature_types[], size_t signature_sizes[]);
+aeten_lang__interface_t* aeten_lang__get_interface(const char* iface_name);
 
 
 #define AETEN_COUNT_OF(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
@@ -128,7 +131,7 @@ static char* _aeten_debug_tmp_str = 0;
 #	define _aeten_lang__destructor(fn) \
 	static void fn(void);\
 	aeten_lang__static_constructor(_aeten_lang__destructor_##fn) { \
-	atexit( fn ); \
+		atexit( fn ); \
 	} \
 	static void fn(void)
 #endif
@@ -145,38 +148,18 @@ static char* _aeten_debug_tmp_str = 0;
 		free(object); \
 	} while(0)
 
+
 #define aeten_lang__call(object_ref, method, ...) \
 	object_ref->method(object_ref, ##__VA_ARGS__)
 
 #define aeten_lang__cnc aeten_lang__cast_and_call
-#define aeten_lang__cast_and_call(object_ref, type, method, ...) do { \
+#define aeten_lang__cast_and_call(object_ref, type, method, ...) ({ \
 	type * ref = aeten_lang__cast_ref(type, object_ref); \
 	ref->method(ref, ##__VA_ARGS__); \
-} while (0);
-
-/** Start a try block whith potentially aeten_lang__Closable resources */
-#define aeten_lang__try(...)
-#define aeten_lang__catch(exception, ...) \
-
-static __thread void* _aeten_lang__raised_exception;
-
-/** Check expression or throws exception (TODO) */
-// TODO: goto aeten_lang__catch__##exception;
-#define aeten_lang__check(expression, exception, message_format, ...) do { \
-		if (!(expression)) { \
-			char* message = aeten_lang__string_from_format(message_format, ##__VA_ARGS__); \
-			char* prefixed_message = aeten_lang__string_from_format("%s +%u: Check (%s): %s (%s)", __func__, __LINE__, #expression, #exception, message); \
-			aeten_lang__Exception* excpt = exception##__new(prefixed_message); \
-			free(message); \
-			free(prefixed_message); \
-			excpt->print_message(excpt); \
-		} \
-	} while (0);
-
+})
 
 // TODO: check instance interfaces before
 #define aeten_lang__cast_ref(type, object_ref) ((type*) object_ref)
-
 
 
 #define _AETEN_REF_OF_EACH_IFACE(iface) &_##iface##_i,
@@ -184,12 +167,19 @@ static __thread void* _aeten_lang__raised_exception;
 // TODO: Get rid of multiple constructor call (move {con,de}structor declaration into c files)
 #define _aeten_lang__define_type(iface, ...) \
 	typedef struct _##iface##_st iface; \
-	static aeten_lang__interface_t _##iface##_i; \
+	aeten_lang__interface_t _##iface##_i; \
 	aeten_lang__static_constructor(_##iface##_c) { \
 		_aeten_lang__construct(&_##iface##_i, #iface, (aeten_lang__interface_t*[]) { \
 			AETEN_FOR_EACH(_AETEN_REF_OF_EACH_IFACE, ##__VA_ARGS__) (aeten_lang__interface_t*)NULL \
-	 }); \
+		}); \
+	} \
+	_aeten_lang__destructor(_##iface##_d) { \
+		aeten_lang__delete(_##iface##_i.methods); \
 	}
 
+void _aeten_lang__init();
+aeten_lang__static_constructor(_aeten_lang__interfaces_c) {
+	_aeten_lang__init();
+}
 
 #endif // AETEN_LANG_H

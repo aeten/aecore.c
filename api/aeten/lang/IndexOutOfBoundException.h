@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _AETEN_LANG_OOBEXCEPTION_H
+#define _AETEN_LANG_OOBEXCEPTION_H
 
 #define AETEN_LANG_IMPLEMENTATION_H \
 	aeten_lang__implementation(aeten_lang__IndexOutOfBoundException, aeten_lang__Exception)
@@ -11,3 +12,5 @@
 
 #include "aeten/lang/Exception.h"
 #include "aeten/lang/implementation.h"
+
+#endif

@@ -2,7 +2,6 @@
 #include "aeten/lang/FixedSizeList.h"
 
 aeten_lang__List * aeten_lang__FixedSizeList__initialize(aeten_lang__FixedSizeList *list, size_t element_size, size_t length) {
-	_aeten_lang__FixedSizeList__init(list);
 	list->_private.elements = calloc(length, element_size);
 	list->_private.length = length;
 	list->_private.element_size = element_size;

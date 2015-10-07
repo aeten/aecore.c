@@ -53,7 +53,7 @@ ${LIB}: ${SRC_O}
 	${CC} -shared -o $@ ${CCFLAGS}  -Iapi -I${GENERATED}/api $^
 	@chmod -x $@
 
-${BUILD}/test/lang: test/lang.c ${SRC_O}
+${BUILD}/test/lang: test/aelang.c ${SRC_O}
 	@-mkdir --parent $$(dirname $@)
 	${CC} ${CCFLAGS} $^ -Iapi -I${GENERATED}/api -o $@
 

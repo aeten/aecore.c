@@ -1,4 +1,3 @@
-#pragma once
 
 #define AETEN_LANG_INTERFACE \
 	aeten_lang__interface(aeten_lang__List)
@@ -16,4 +15,9 @@
 	/** Appends the specified element to the end of this list. */ \
 	aeten_lang__method(void, add, void* /* element */);
 
+#ifndef _AETEN_LANG_LIST_H
+#define _AETEN_LANG_LIST_H
+
 #include "aeten/lang/interface.h"
+
+#endif
