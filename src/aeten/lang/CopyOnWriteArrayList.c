@@ -3,10 +3,11 @@
 #include "aeten/lang/IndexOutOfBoundException.h"
 
 aeten_lang__List * aeten_lang__CopyOnWriteArrayList__initialize(aeten_lang__CopyOnWriteArrayList *list, size_t element_size) {
-	volatile aeten_lang__array_t* array = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.array;
+	aeten_lang__array_t* volatile array =  (aeten_lang__array_t*)calloc(1, sizeof(aeten_lang__array_t));
 	array->elements = NULL;
 	array->length = 0;
 	array->element_size = element_size;
+	list->_private.array = array;
 	return aeten_lang__cast_ref(aeten_lang__List, list);
 }
 
@@ -39,18 +40,21 @@ void aeten_lang__CopyOnWriteArrayList__add(aeten_lang__List *list, void *element
 	aeten_lang__CopyOnWriteArrayList* cow_list = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list);
 	aeten_lang__array_t* volatile array = cow_list->_private.array;
 	aeten_lang__array_t* volatile new_array =  (aeten_lang__array_t*)calloc(1, sizeof(aeten_lang__array_t));
-	new_array->length++;
+	new_array->length = array->length+1;
+	new_array->element_size = array->element_size;
 	new_array->elements = malloc(new_array->element_size * new_array->length);
 	if (array->length>0) {
 		memcpy(new_array->elements, array->elements, array->element_size * array->length);
 	}
 
 	unsigned long pointer = (unsigned long)new_array->elements;
-	pointer += new_array->length-1 * new_array->element_size;
+	pointer += array->length * new_array->element_size;
 	memcpy((void*)pointer, element, new_array->element_size);
 	cow_list->_private.array = new_array;
 
-	free(array->elements);
+	if (array->elements) {
+		free(array->elements);
+	}
 	free(array);
 }
 

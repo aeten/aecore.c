@@ -1,8 +1,8 @@
 #include <stdio.h>
 #define AETEN_LANG_MAIN
 #include "aeten/lang/import.h"
-#include "aeten/lang/CopyOnWriteArrayList.h"
 #include "aeten/lang/ArrayList.h"
+#include "aeten/lang/CopyOnWriteArrayList.h"
 #include "aeten/lang/Throwable.h"
 #include "aeten/lang/IndexOutOfBoundException.h"
 
@@ -47,8 +47,7 @@ void print_parents(const char* interface, unsigned int level) {
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 int main(int argc, char **argv) {
 	unsigned int i, value;
-//	List* list = aeten_lang__CopyOnWriteArrayList__new(sizeof(int));
-	List* list = aeten_lang__ArrayList__new(sizeof(int), 5);
+	List* list = aeten_lang__CopyOnWriteArrayList__new(sizeof(int));
 	for (i=0; i<10; ++i) {
 		list->add(list, (void*)&i);
 	}

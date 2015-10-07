@@ -1,5 +1,6 @@
 #include <signal.h>
 #include "aeten/lang/Closable.h"
+
 #undef AETEN_LANG_INTERFACE
 #undef AETEN_LANG_METHODS
 
@@ -30,7 +31,10 @@ void aeten_lang__Throwable__reset(void);
 
 
 
-/** Start a try block whith potentially aeten_lang__Closable resources */
+/**
+ * Start a try block whith potentially aeten_lang__Closable resources.
+ * Needs aeten/lang/ArrayList.h inclusion
+ */
 #define aeten_lang__try(...) { \
 	__label__ _finally_;\
 	unsigned int _handled_exception_index_ = 0; \
