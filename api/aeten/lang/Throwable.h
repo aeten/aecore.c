@@ -1,9 +1,7 @@
 #include <signal.h>
 #include "aeten/lang/Closable.h"
 
-#undef AETEN_LANG_INTERFACE
-#undef AETEN_LANG_METHODS
-
+#include "aeten/lang/start-interface.h"
 #define AETEN_LANG_INTERFACE \
 	aeten_lang__interface(aeten_lang__Throwable)
 
@@ -13,8 +11,7 @@
 
 #ifndef _AETEN_LANG_EXCEPTION_H
 #define _AETEN_LANG_EXCEPTION_H
-
-#include "aeten/lang/interface.h"
+#include "aeten/lang/end-interface.h"
 
 typedef void   (*aeten_lang__try_t)   (void);
 typedef void   (*aeten_lang__catch_t) (aeten_lang__Throwable* exception);

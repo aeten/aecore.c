@@ -1,3 +1,4 @@
+#include "aeten/lang/start-interface.h"
 #define AETEN_LANG_INTERFACE \
 	aeten_lang__interface(aeten_lang__Enum)
 
@@ -6,6 +7,6 @@
 
 #ifndef _AETEN_LANG_ENUM_H
 #define _AETEN_LANG_ENUM_H
-#include "aeten/lang/interface.h"
+#include "aeten/lang/end-interface.h"
 
 #endif
