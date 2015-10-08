@@ -4,60 +4,61 @@
 #define aeten_lang__interface(iface, ...) iface
 #undef aeten_lang__implementation
 #define aeten_lang__implementation(impl, iface) iface
-#if defined(AETEN_LANG_INTERFACE)// && (!defined(AETEN_LANG_IMPLEMENTATION_H) || AETEN_LANG_IMPLEMENTATION_H == AETEN_LANG_INTERFACE)
-#	define _AETEN_LANG_IFACE(prefix, suffix) _AETEN_LANG_IFACE_1(prefix, AETEN_LANG_INTERFACE, suffix)
-#	define _AETEN_LANG_IFACE_1(prefix, iface, suffix) _AETEN_LANG_IFACE_2(prefix, iface, suffix)
-#	define _AETEN_LANG_IFACE_2(prefix, iface, suffix) prefix##iface##suffix
+#if defined(AETEN_LANG_INTERFACE)
+	#define _AETEN_LANG_IFACE(prefix, suffix) _AETEN_LANG_IFACE_1(prefix, AETEN_LANG_INTERFACE, suffix)
+	#define _AETEN_LANG_IFACE_1(prefix, iface, suffix) _AETEN_LANG_IFACE_2(prefix, iface, suffix)
+	#define _AETEN_LANG_IFACE_2(prefix, iface, suffix) prefix##iface##suffix
 
-#	undef aeten_lang__interface
-#	define aeten_lang__interface(iface, ...) \
+	#undef aeten_lang__interface
+	#define aeten_lang__interface(iface, ...) \
 		_aeten_lang__define_type(iface, ##__VA_ARGS__)
-AETEN_LANG_INTERFACE
+	AETEN_LANG_INTERFACE
 
-#	undef aeten_lang__interface
-#	define aeten_lang__interface(iface, ...) iface
+	#undef aeten_lang__interface
+	#define aeten_lang__interface(iface, ...) iface
 
-#	ifdef AETEN_LANG_METHODS
-/* {{{ Method definition */
-#	define aeten_lang__method(type, nm, ...) \
-		typedef type (*_AETEN_LANG_IFACE(_, __##nm##_t))(AETEN_LANG_INTERFACE*, ##__VA_ARGS__); \
-		static void (_AETEN_LANG_IFACE(_, __##nm##_constr))(void) __attribute__((constructor)); \
-		static void (_AETEN_LANG_IFACE(_, __##nm##_constr))(void) { \
-			char *types[] = AETEN_STRING_OF_EACH(type, ##__VA_ARGS__); \
-			size_t sizes[] = AETEN_SIZE_OF_EACH(type, ##__VA_ARGS__); \
-			_aeten_lang__method_construct(&_AETEN_LANG_IFACE(_, _i), #nm,  types, sizes); \
-		}
-	AETEN_LANG_METHODS
-#	undef aeten_lang__method
-/* }}} */
-
-/* {{{ Method structure */
-	typedef struct _AETEN_LANG_IFACE(_, _st) {
-		_aeten_lang__object_header;
-#		define aeten_lang__method(type, name, ...) type (*name)(AETEN_LANG_INTERFACE*, ##__VA_ARGS__);
+	#ifdef AETEN_LANG_METHODS
+		/* {{{ Method definition */
+		#define aeten_lang__method(type, nm, ...) \
+			typedef type (*_AETEN_LANG_IFACE(_, __##nm##_t))(AETEN_LANG_INTERFACE*, ##__VA_ARGS__); \
+			static void (_AETEN_LANG_IFACE(_, __##nm##_constr))(void) __attribute__((constructor)); \
+			static void (_AETEN_LANG_IFACE(_, __##nm##_constr))(void) { \
+				char *types[] = AETEN_STRING_OF_EACH(type, ##__VA_ARGS__); \
+				size_t sizes[] = AETEN_SIZE_OF_EACH(type, ##__VA_ARGS__); \
+				_aeten_lang__method_construct(&_AETEN_LANG_IFACE(_, _i), #nm,  types, sizes); \
+			}
 		AETEN_LANG_METHODS
-#		undef aeten_lang__method
-	} _AETEN_LANG_IFACE(_, _t);
-/* }}} */
+		#undef aeten_lang__method
+		/* }}} */
 
-#	endif// Methods
+		/* {{{ Method structure */
+		typedef struct _AETEN_LANG_IFACE(_, _st) {
+			_aeten_lang__object_header;
+			#define aeten_lang__method(type, name, ...) \
+				type (*name)(AETEN_LANG_INTERFACE*, ##__VA_ARGS__);
+			AETEN_LANG_METHODS
+			#undef aeten_lang__method
+		} _AETEN_LANG_IFACE(_, _t);
+		/* }}} */
 
-#ifndef AETEN_LANG_IMPLEMENTATION_H
-	#undef AETEN_LANG_METHODS
-	#undef AETEN_LANG_INTERFACE
-#else
+	#endif// Methods
 
-#undef aeten_lang__interface
-#define aeten_lang__interface(iface, ...) iface
-#define aeten_lang__implementation(impl, iface) iface
-#if defined(AETEN_LANG_IMPLEMENTATION_H) && (AETEN_LANG_IMPLEMENTATION_H != AETEN_LANG_INTERFACE)
-	#undef AETEN_LANG_METHODS
-	#undef AETEN_LANG_INTERFACE
-#endif
-#undef aeten_lang__implementation
-#endif
+	#ifndef AETEN_LANG_IMPLEMENTATION_H
+		#undef AETEN_LANG_METHODS
+		#undef AETEN_LANG_INTERFACE
+	#else
 
-#undef aeten_lang__method
-#undef aeten_lang__interface
+		#undef aeten_lang__interface
+		#define aeten_lang__interface(iface, ...) iface
+		#define aeten_lang__implementation(impl, iface) iface
+		#if defined(AETEN_LANG_IMPLEMENTATION_H) && (AETEN_LANG_IMPLEMENTATION_H != AETEN_LANG_INTERFACE)
+			#undef AETEN_LANG_METHODS
+			#undef AETEN_LANG_INTERFACE
+		#endif
+		#undef aeten_lang__implementation
+	#endif
+
+	#undef aeten_lang__method
+	#undef aeten_lang__interface
 
 #endif

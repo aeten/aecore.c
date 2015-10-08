@@ -59,71 +59,71 @@
 
 	/*	{{{ Instance init */
 	//void impl##__init(impl*)
-#undef  aeten_lang__constructor
+	#undef  aeten_lang__constructor
 	void _AETEN_LANG_IMPL(_, __init_interface) (AETEN_LANG_IMPLEMENTATION_H* instance);
-#if (AETEN_LANG_IMPLEMENTATION_H == AETEN_LANG_INTERFACE)
-	#ifdef AETEN_LANG_IMPLEMENTATION_C
-		#undef  aeten_lang__method
-		#define aeten_lang__method(type, mthd, ...) \
-			instance->mthd = _AETEN_LANG_IMPL(, __##mthd);
-		void _AETEN_LANG_IMPL(_, __init_interface) (AETEN_LANG_IMPLEMENTATION_H* instance) {
-			memset(instance, 0, sizeof(AETEN_LANG_IMPLEMENTATION_H));
-			/* methods */
-			AETEN_LANG_METHODS
-			instance->_interface = AETEN_STRINGIZE(AETEN_LANG_IMPLEMENTATION_H);
-			instance->_initialize = (aeten_lang__initializer_t)_AETEN_LANG_IMPL(, __initialize);
-			instance->_finalize = (aeten_lang__finalizer_t)_AETEN_LANG_IMPL(, __finalize);
-		}
-#endif
-
-#if (AETEN_LANG_IMPLEMENTATION_H == AETEN_LANG_INTERFACE)
-	#define aeten_lang__constructor(...) \
-		AETEN_LANG_INTERFACE* _AETEN_LANG_IMPL(_, __init)(AETEN_LANG_IMPLEMENTATION_H* instance, _aeten_lang__arg_3(AETEN_FOR_EACH_I(_aeten_lang__arg_1, ##__VA_ARGS__)));
-	AETEN_LANG_CONSTRUCTORS
-	#ifdef AETEN_LANG_IMPLEMENTATION_C
-		#undef  aeten_lang__constructor
-		#define aeten_lang__constructor(...) \
-			AETEN_LANG_INTERFACE* _AETEN_LANG_IMPL(_, __init)(AETEN_LANG_IMPLEMENTATION_H* instance, _aeten_lang__arg_3(AETEN_FOR_EACH_I(_aeten_lang__arg_1, ##__VA_ARGS__))) { \
-				memset(instance, 0, sizeof(AETEN_LANG_IMPLEMENTATION_H)); \
-				_AETEN_LANG_IMPL(_, __init_interface)(instance); \
-				_AETEN_LANG_IMPL(, __initialize)(instance, AETEN_FOR_EACH_I(_aeten_lang__arg_2, ##__VA_ARGS__)); \
-				return (AETEN_LANG_INTERFACE*)instance; \
+	#if (AETEN_LANG_IMPLEMENTATION_H == AETEN_LANG_INTERFACE)
+		#ifdef AETEN_LANG_IMPLEMENTATION_C
+			#undef  aeten_lang__method
+			#define aeten_lang__method(type, mthd, ...) \
+				instance->mthd = _AETEN_LANG_IMPL(, __##mthd);
+			void _AETEN_LANG_IMPL(_, __init_interface) (AETEN_LANG_IMPLEMENTATION_H* instance) {
+				memset(instance, 0, sizeof(AETEN_LANG_IMPLEMENTATION_H));
+				/* methods */
+				AETEN_LANG_METHODS
+				instance->_interface = AETEN_STRINGIZE(AETEN_LANG_IMPLEMENTATION_H);
+				instance->_initialize = (aeten_lang__initializer_t)_AETEN_LANG_IMPL(, __initialize);
+				instance->_finalize = (aeten_lang__finalizer_t)_AETEN_LANG_IMPL(, __finalize);
 			}
+		#endif
+
+		#if (AETEN_LANG_IMPLEMENTATION_H == AETEN_LANG_INTERFACE)
+			#define aeten_lang__constructor(...) \
+				AETEN_LANG_INTERFACE* _AETEN_LANG_IMPL(_, __init)(AETEN_LANG_IMPLEMENTATION_H* instance, _aeten_lang__arg_3(AETEN_FOR_EACH_I(_aeten_lang__arg_1, ##__VA_ARGS__)));
+			AETEN_LANG_CONSTRUCTORS
+			#ifdef AETEN_LANG_IMPLEMENTATION_C
+				#undef  aeten_lang__constructor
+				#define aeten_lang__constructor(...) \
+					AETEN_LANG_INTERFACE* _AETEN_LANG_IMPL(_, __init)(AETEN_LANG_IMPLEMENTATION_H* instance, _aeten_lang__arg_3(AETEN_FOR_EACH_I(_aeten_lang__arg_1, ##__VA_ARGS__))) { \
+						memset(instance, 0, sizeof(AETEN_LANG_IMPLEMENTATION_H)); \
+						_AETEN_LANG_IMPL(_, __init_interface)(instance); \
+						_AETEN_LANG_IMPL(, __initialize)(instance, AETEN_FOR_EACH_I(_aeten_lang__arg_2, ##__VA_ARGS__)); \
+						return (AETEN_LANG_INTERFACE*)instance; \
+					}
+				AETEN_LANG_CONSTRUCTORS
+			#endif
+		#endif
+
+		//iface* impl##__new(__VA_ARGS__)
+		#undef  aeten_lang__constructor
+		#ifdef AETEN_LANG_IMPLEMENTATION_C
+			#define aeten_lang__constructor(...) \
+				AETEN_LANG_INTERFACE* _AETEN_LANG_IMPL(, __new)(_aeten_lang__arg_3(AETEN_FOR_EACH_I(_aeten_lang__arg_1, ##__VA_ARGS__))); \
+				AETEN_LANG_INTERFACE* _AETEN_LANG_IMPL(, __new)(_aeten_lang__arg_3(AETEN_FOR_EACH_I(_aeten_lang__arg_1, ##__VA_ARGS__))) { \
+					AETEN_LANG_IMPLEMENTATION_H *instance = (AETEN_LANG_IMPLEMENTATION_H *) calloc(1, sizeof(AETEN_LANG_IMPLEMENTATION_H)); \
+					_AETEN_LANG_IMPL(_, __init)(instance, AETEN_FOR_EACH_I(_aeten_lang__arg_2, ##__VA_ARGS__)); \
+					return aeten_lang__cast_ref(AETEN_LANG_INTERFACE, instance); \
+				}
+		#else
+			#define aeten_lang__constructor(...) \
+				AETEN_LANG_INTERFACE* _AETEN_LANG_IMPL(, __new)(_aeten_lang__arg_3(AETEN_FOR_EACH_I(_aeten_lang__arg_1, ##__VA_ARGS__)));
+		#endif
 		AETEN_LANG_CONSTRUCTORS
 	#endif
-#endif
-
-	//iface* impl##__new(__VA_ARGS__)
-	#undef  aeten_lang__constructor
-	#ifdef AETEN_LANG_IMPLEMENTATION_C
-		#define aeten_lang__constructor(...) \
-			AETEN_LANG_INTERFACE* _AETEN_LANG_IMPL(, __new)(_aeten_lang__arg_3(AETEN_FOR_EACH_I(_aeten_lang__arg_1, ##__VA_ARGS__))); \
-			AETEN_LANG_INTERFACE* _AETEN_LANG_IMPL(, __new)(_aeten_lang__arg_3(AETEN_FOR_EACH_I(_aeten_lang__arg_1, ##__VA_ARGS__))) { \
-			AETEN_LANG_IMPLEMENTATION_H *instance = (AETEN_LANG_IMPLEMENTATION_H *) calloc(1, sizeof(AETEN_LANG_IMPLEMENTATION_H)); \
-			_AETEN_LANG_IMPL(_, __init)(instance, AETEN_FOR_EACH_I(_aeten_lang__arg_2, ##__VA_ARGS__)); \
-			return aeten_lang__cast_ref(AETEN_LANG_INTERFACE, instance); \
-		}
-	#else
-		#define aeten_lang__constructor(...) \
-			AETEN_LANG_INTERFACE* _AETEN_LANG_IMPL(, __new)(_aeten_lang__arg_3(AETEN_FOR_EACH_I(_aeten_lang__arg_1, ##__VA_ARGS__)));
-	#endif
-	AETEN_LANG_CONSTRUCTORS
-#endif
-/*	}}} */
+	/*	}}} */
 
 
-#undef _aeten_lang__private_1
-#undef aeten_lang__implementation
-#undef aeten_lang__constructor
-#undef aeten_lang__private
-#undef aeten_lang__method
-#undef _AETEN_LANG_IMPL
-#undef _AETEN_LANG_IMPL_1
-#undef _AETEN_LANG_IMPL_2
-#undef AETEN_LANG_IMPLEMENTATION_H
-#undef AETEN_LANG_PRIVATE
-#undef AETEN_LANG_CONSTRUCTORS
-#undef AETEN_LANG_IMPLEMENTATION_C
-#undef AETEN_LANG_METHODS
-#undef AETEN_LANG_INTERFACE
+	#undef _aeten_lang__private_1
+	#undef aeten_lang__implementation
+	#undef aeten_lang__constructor
+	#undef aeten_lang__private
+	#undef aeten_lang__method
+	#undef _AETEN_LANG_IMPL
+	#undef _AETEN_LANG_IMPL_1
+	#undef _AETEN_LANG_IMPL_2
+	#undef AETEN_LANG_IMPLEMENTATION_H
+	#undef AETEN_LANG_PRIVATE
+	#undef AETEN_LANG_CONSTRUCTORS
+	#undef AETEN_LANG_IMPLEMENTATION_C
+	#undef AETEN_LANG_METHODS
+	#undef AETEN_LANG_INTERFACE
 #endif
