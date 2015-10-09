@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <assert.h>
 #define AETEN_LANG_MAIN
 #include "aeten/lang/import.h"
 #include "aeten/lang/ArrayList.h"
@@ -51,6 +52,8 @@ int main(int argc, char **argv) {
 	for (i=0; i<10; ++i) {
 		list->add(list, (void*)&i);
 	}
+	aeten_lang__Iterator* iterator = list->iterator((aeten_lang__Iterable*)list);
+	assert(iterator==NULL);
 
 	print_parents(list->_interface, 0);
 	aeten_lang__try() {

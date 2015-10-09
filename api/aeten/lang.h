@@ -91,9 +91,9 @@ struct aeten_lang__method_implementation_st {
 	void *implementation;
 };
 
-void _aeten_lang__construct(aeten_lang__interface_t *iface, char const *iface_name, aeten_lang__interface_t *ifc_list[]);
+void _aeten_lang__construct(char const *iface, aeten_lang__interface_t *ifc_list[]);
 char *_aeten_lang__join_strings(char *dest, char* src[], char join);
-void _aeten_lang__method_construct(aeten_lang__interface_t *iface, char const *name, char *signature_types[], size_t signature_sizes[]);
+void _aeten_lang__method_construct(char const *iface, char const *name, char *signature_types[], size_t signature_sizes[]);
 aeten_lang__interface_t* aeten_lang__get_interface(const char* iface_name);
 
 
@@ -143,21 +143,19 @@ aeten_lang__interface_t* aeten_lang__get_interface(const char* iface_name);
 #define aeten_lang__cast_ref(type, object_ref) ((type*) object_ref)
 
 
-#define _AETEN_REF_OF_EACH_IFACE(iface) &_##iface##_i,
+#define _AETEN_REF_OF_EACH_IFACE(iface) aeten_lang__get_interface(#iface),
 // TODO: fill Interface structure with methods
 // TODO: Get rid of multiple constructor call (move {con,de}structor declaration into c files)
 #define _aeten_lang__define_type(iface, ...) \
-	typedef struct _##iface##_st iface; \
-	aeten_lang__interface_t _##iface##_i; \
+	struct iface##_st { \
+		struct aeten_lang__object_header_st; \
+		struct _##iface##_st; \
+	}; \
 	static void _##iface##_c(void) __attribute__((constructor)) ; \
 	static void _##iface##_c(void) { \
-		_aeten_lang__construct(&_##iface##_i, #iface, (aeten_lang__interface_t*[]) { \
+		_aeten_lang__construct(#iface, (aeten_lang__interface_t*[]) { \
 			AETEN_FOR_EACH(_AETEN_REF_OF_EACH_IFACE, ##__VA_ARGS__) (aeten_lang__interface_t*)NULL \
 		}); \
-	} \
-	static void _##iface##_d(void) __attribute__((destructor)); \
-	static void _##iface##_d(void) { \
-		aeten_lang__delete(_##iface##_i.methods); \
 	}
 
 void _aeten_lang__init(void);

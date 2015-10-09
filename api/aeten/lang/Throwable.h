@@ -1,4 +1,5 @@
 #include <signal.h>
+#define AETEN_LANG_REQUIRE
 #include "aeten/lang/Closable.h"
 
 #include "aeten/lang/start-interface.h"

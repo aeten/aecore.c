@@ -2,11 +2,11 @@ SHELL=sh
 GENERATED=generated
 BUILD=build
 CC=gcc
-STANDARD=gnu99
+STANDARD=gnu11
 CCWARNING=old-style-definition strict-prototypes missing-prototypes all extra
 OPTIMITATION=0
 
-CCFLAGS=-g -O${OPTIMITATION} -fPIC -std=${STANDARD} $(addprefix -W,${CCWARNING})
+CCFLAGS=-g -O${OPTIMITATION} -fPIC -std=${STANDARD} -fplan9-extensions $(addprefix -W,${CCWARNING})
 
 NAME=$(notdir $(realpath $(dir $MAKEFILE)))
 VERSION=$(shell { git describe --tags --match='[0-9]*\.[0-9]*' --dirty=+ 2>/dev/null || echo g$$(git describe --always --dirty=+); } | sed 's@.*/@@')

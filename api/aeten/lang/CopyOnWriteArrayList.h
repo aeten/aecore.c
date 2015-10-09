@@ -1,5 +1,6 @@
 #ifndef _AETEN_LANG_COW_H
 #define _AETEN_LANG_COW_H
+//#include "aeten/lang/List.h"
 
 /**
  * Thread safe copy on write List implementation.

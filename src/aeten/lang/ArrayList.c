@@ -59,3 +59,10 @@ void* aeten_lang__ArrayList__get(aeten_lang__List *list, unsigned int position) 
 size_t aeten_lang__ArrayList__size(aeten_lang__List *list) {
 	return aeten_lang__cast_ref(aeten_lang__ArrayList, list)->_private.size;
 }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+aeten_lang__Iterator* aeten_lang__ArrayList__iterator(aeten_lang__Iterable *list) {
+	return NULL; //TODO
+}
+#pragma GCC diagnostic pop
