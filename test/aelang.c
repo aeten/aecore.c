@@ -52,10 +52,13 @@ int main(int argc, char **argv) {
 	for (i=0; i<10; ++i) {
 		list->add(list, (void*)&i);
 	}
-	aeten_lang__Iterator* iterator = list->iterator((aeten_lang__Iterable*)list);
+	
+	/* check cast */
+	aeten_lang__Iterable* iterable = aeten_lang__cast_ref(aeten_lang__Iterable, list);
+	aeten_lang__Iterator* iterator = iterable->iterator(iterable);
 	assert(iterator==NULL);
 
-	print_parents(list->_interface, 0);
+	print_parents(list->_implementation->interface, 0);
 	aeten_lang__try() {
 		size_t size = list->size(list);
 		for (i=0; i<size; ++i) {
@@ -63,7 +66,7 @@ int main(int argc, char **argv) {
 			printf("Value of list[%d]=%d\n", i, value);
 		}
 	} aeten_lang__catch(aeten_lang__IndexOutOfBoundException, exception) {
-		exception->print_message((aeten_lang__Throwable*)exception);
+		exception->print_message(exception);
 	} aeten_lang__finally() {
 		printf("Finally\n");
 	}

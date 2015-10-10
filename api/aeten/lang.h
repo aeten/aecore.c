@@ -22,7 +22,7 @@ typedef struct aeten_lang__class_st                 aeten_lang__class_t;
 typedef struct aeten_lang__method_definition_st     aeten_lang__method_definition_t;
 typedef struct aeten_lang__method_implementation_st aeten_lang__method_implementation_t;
 typedef struct aeten_lang__type_st                  aeten_lang__type_t;
-typedef struct aeten_lang__object_header_st         aeten_lang__object_header_t;
+typedef struct aeten_lang__implementation_st        aeten_lang__implementation_t;
 typedef struct aeten_lang__Signature_st             aeten_lang__Signature;
 typedef struct aeten_lang__MethodsList_st           aeten_lang__MethodsList;
 typedef struct aeten_lang__ParentsList_st           aeten_lang__ParentsList;
@@ -51,31 +51,28 @@ struct aeten_lang__interface_st {
 };
 
 
-#define _aeten_lang__object_header \
-	char*                     _interface; \
-	aeten_lang__initializer_t _initialize; \
-	aeten_lang__finalizer_t   _finalize
-
-struct aeten_lang__object_header_st {
-	_aeten_lang__object_header;
+struct aeten_lang__implementation_st {
+	char*                   interface;
+	void*                   instance;
+	size_t                  size;
+	aeten_lang__finalizer_t finalize;
 };
 
-#define _aeten_lang__InterfaceList \
-	_aeten_lang__object_header; \
-	size_t (*size)(/*aeten_lang__List*/void*)
-
 struct aeten_lang__Signature_st {
-	_aeten_lang__InterfaceList;
+	aeten_lang__implementation_t* _implementation;
+	size_t (*size)(aeten_lang__Signature*);
 	aeten_lang__type_t*  (*get) (aeten_lang__Signature*, unsigned int);
 };
 
 struct aeten_lang__MethodsList_st {
-	_aeten_lang__InterfaceList;
+	aeten_lang__implementation_t* _implementation;
+	size_t (*size)(aeten_lang__MethodsList*);
 	aeten_lang__method_definition_t*  (*get) (aeten_lang__MethodsList*, unsigned int);
 };
 
 struct aeten_lang__ParentsList_st {
-	_aeten_lang__InterfaceList;
+	aeten_lang__implementation_t* _implementation;
+	size_t (*size)(aeten_lang__ParentsList*);
 	aeten_lang__interface_t*  (*get) (aeten_lang__ParentsList*, unsigned int);
 };
 
@@ -124,8 +121,8 @@ aeten_lang__interface_t* aeten_lang__get_interface(const char* iface_name);
 	((aeten_lang__type_t) { #a, sizeof(a) })
 
 #define aeten_lang__delete(object) do { \
-		object->_finalize((aeten_lang__interface_t*)object); \
-		free(object); \
+		object->_implementation->finalize((aeten_lang__interface_t*)object); \
+		free(object->_implementation); \
 	} while(0)
 
 
@@ -140,17 +137,11 @@ aeten_lang__interface_t* aeten_lang__get_interface(const char* iface_name);
 
 
 // TODO: check instance interfaces before
-#define aeten_lang__cast_ref(type, object_ref) ((type*) object_ref)
+#define aeten_lang__cast_ref(type, object_ref) (object_ref->_as__##type)
 
 
 #define _AETEN_REF_OF_EACH_IFACE(iface) aeten_lang__get_interface(#iface),
-// TODO: fill Interface structure with methods
-// TODO: Get rid of multiple constructor call (move {con,de}structor declaration into c files)
 #define _aeten_lang__define_type(iface, ...) \
-	struct iface##_st { \
-		struct aeten_lang__object_header_st; \
-		struct _##iface##_st; \
-	}; \
 	static void _##iface##_c(void) __attribute__((constructor)) ; \
 	static void _##iface##_c(void) { \
 		_aeten_lang__construct(#iface, (aeten_lang__interface_t*[]) { \

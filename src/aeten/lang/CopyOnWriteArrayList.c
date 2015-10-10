@@ -2,13 +2,12 @@
 #include "aeten/lang/CopyOnWriteArrayList.h"
 #include "aeten/lang/IndexOutOfBoundException.h"
 
-aeten_lang__List * aeten_lang__CopyOnWriteArrayList__initialize(aeten_lang__CopyOnWriteArrayList *list, size_t element_size) {
+void aeten_lang__CopyOnWriteArrayList__initialize(aeten_lang__CopyOnWriteArrayList *list, size_t element_size) {
 	aeten_lang__array_t* volatile array =  (aeten_lang__array_t*)calloc(1, sizeof(aeten_lang__array_t));
 	array->elements = NULL;
 	array->length = 0;
 	array->element_size = element_size;
 	list->_private.array = array;
-	return aeten_lang__cast_ref(aeten_lang__List, list);
 }
 
 void aeten_lang__CopyOnWriteArrayList__finalize(aeten_lang__CopyOnWriteArrayList *list) {
@@ -16,8 +15,8 @@ void aeten_lang__CopyOnWriteArrayList__finalize(aeten_lang__CopyOnWriteArrayList
 	free(list->_private.array);
 }
 
-void aeten_lang__CopyOnWriteArrayList__set(aeten_lang__List *list, unsigned int position, void *element) {
-	aeten_lang__array_t* array = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.array;
+void aeten_lang__CopyOnWriteArrayList__set(aeten_lang__CopyOnWriteArrayList *list, unsigned int position, void *element) {
+	aeten_lang__array_t* array = list->_private.array;
 	if(position >= array->length) {
 		aeten_lang__check(position < array->length, aeten_lang__IndexOutOfBoundException, "position=%u; array.length=%u", position, array->length);
 	}
@@ -26,8 +25,8 @@ void aeten_lang__CopyOnWriteArrayList__set(aeten_lang__List *list, unsigned int 
 	memcpy((void*)pointer, element, array->element_size);
 }
 
-void * aeten_lang__CopyOnWriteArrayList__get(aeten_lang__List *list, unsigned int position) {
-	volatile aeten_lang__array_t* array = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.array;
+void * aeten_lang__CopyOnWriteArrayList__get(aeten_lang__CopyOnWriteArrayList *list, unsigned int position) {
+	volatile aeten_lang__array_t* array = list->_private.array;
 	if(position >= array->length) {
 		aeten_lang__check(position < array->length, aeten_lang__IndexOutOfBoundException, "position=%u; array.length=%u", position, array->length);
 	}
@@ -36,9 +35,8 @@ void * aeten_lang__CopyOnWriteArrayList__get(aeten_lang__List *list, unsigned in
 	return (void*)pointer;
 }
 
-void aeten_lang__CopyOnWriteArrayList__add(aeten_lang__List *list, void *element) {
-	aeten_lang__CopyOnWriteArrayList* cow_list = aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list);
-	aeten_lang__array_t* volatile array = cow_list->_private.array;
+void aeten_lang__CopyOnWriteArrayList__add(aeten_lang__CopyOnWriteArrayList *list, void *element) {
+	aeten_lang__array_t* volatile array = list->_private.array;
 	aeten_lang__array_t* volatile new_array =  (aeten_lang__array_t*)calloc(1, sizeof(aeten_lang__array_t));
 	new_array->length = array->length+1;
 	new_array->element_size = array->element_size;
@@ -50,7 +48,7 @@ void aeten_lang__CopyOnWriteArrayList__add(aeten_lang__List *list, void *element
 	unsigned long pointer = (unsigned long)new_array->elements;
 	pointer += array->length * new_array->element_size;
 	memcpy((void*)pointer, element, new_array->element_size);
-	cow_list->_private.array = new_array;
+	list->_private.array = new_array;
 
 	if (array->elements) {
 		free(array->elements);
@@ -58,13 +56,13 @@ void aeten_lang__CopyOnWriteArrayList__add(aeten_lang__List *list, void *element
 	free(array);
 }
 
-size_t aeten_lang__CopyOnWriteArrayList__size(aeten_lang__List *list) {
-	return aeten_lang__cast_ref(aeten_lang__CopyOnWriteArrayList, list)->_private.array->length;
+size_t aeten_lang__CopyOnWriteArrayList__size(aeten_lang__CopyOnWriteArrayList *list) {
+	return list->_private.array->length;
 }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-aeten_lang__Iterator* aeten_lang__CopyOnWriteArrayList__iterator(aeten_lang__Iterable *list) {
+aeten_lang__Iterator* aeten_lang__CopyOnWriteArrayList__iterator(aeten_lang__CopyOnWriteArrayList *list) {
 	return NULL; //TODO
 }
 #pragma GCC diagnostic pop

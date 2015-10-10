@@ -79,7 +79,7 @@ void aeten_lang__Throwable__reset(void);
 		aeten_lang__Throwable__handle(_handled_exception_ref_); \
 		_handled_exception_ref_->exception = #exception_interface; \
 		_catch_block_ =  (aeten_lang__catch_t)({ \
-			void _aeten_lang__block_ (exception_interface* exception) \
+			void _aeten_lang__block_ (aeten_lang__Throwable* exception) \
 
 #define aeten_lang__finally(finally_block) \
 			_aeten_lang__block_; \
