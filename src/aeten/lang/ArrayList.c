@@ -22,9 +22,7 @@ void ArrayList__finalize(ArrayList *list) {
 }
 
 void ArrayList__set(ArrayList *list, unsigned int position, void *element) {
-	if(position >= list->_private.size) {
-		check(position < list->_private.size, IndexOutOfBoundException, "position=%u; array.length=%u", position, list->_private.size);
-	}
+	check(position < list->_private.size, IndexOutOfBoundException, "position=%u; array.length=%u", position, list->_private.size);
 	unsigned long pointer = (unsigned long)list->_private.elements;
 	pointer += position*list->_private.element_size;
 	memcpy((void*)pointer, element, list->_private.element_size);
@@ -44,9 +42,7 @@ void ArrayList__add(ArrayList *list, void *element) {
 }
 
 void* ArrayList__get(ArrayList *list, unsigned int position) {
-	if(position >= list->_private.size) {
-		check(position < list->_private.size, IndexOutOfBoundException, "position=%u; array.length=%u", position, list->_private.size);
-	}
+	check(position < list->_private.size, IndexOutOfBoundException, "position=%u; array.length=%u", position, list->_private.size);
 	unsigned long pointer = (unsigned long)list->_private.elements;
 	pointer += position*list->_private.element_size;
 	return (void*)pointer;

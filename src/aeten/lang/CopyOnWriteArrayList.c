@@ -18,9 +18,7 @@ void CopyOnWriteArrayList__finalize(CopyOnWriteArrayList *list) {
 
 void CopyOnWriteArrayList__set(CopyOnWriteArrayList *list, unsigned int position, void *element) {
 	aeten_lang__array_t* array = list->_private.array;
-	if(position >= array->length) {
-		check(position < array->length, IndexOutOfBoundException, "position=%u; array.length=%u", position, array->length);
-	}
+	check(position < array->length, IndexOutOfBoundException, "position=%u; array.length=%u", position, array->length);
 	unsigned long pointer = (unsigned long)array->elements;
 	pointer += position*array->element_size;
 	memcpy((void*)pointer, element, array->element_size);
@@ -28,9 +26,7 @@ void CopyOnWriteArrayList__set(CopyOnWriteArrayList *list, unsigned int position
 
 void * CopyOnWriteArrayList__get(CopyOnWriteArrayList *list, unsigned int position) {
 	volatile aeten_lang__array_t* array = list->_private.array;
-	if(position >= array->length) {
-		check(position < array->length, IndexOutOfBoundException, "position=%u; array.length=%u", position, array->length);
-	}
+	check(position < array->length, IndexOutOfBoundException, "position=%u; array.length=%u", position, array->length);
 	unsigned long pointer = (unsigned long)array->elements;
 	pointer += position*array->element_size;
 	return (void*)pointer;

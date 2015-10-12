@@ -14,18 +14,14 @@ void FixedSizeList__finalize(FixedSizeList *list) {
 }
 
 void FixedSizeList__set(FixedSizeList *list, unsigned int position, void *element) {
-	if(position >= list->_private.length) {
-		check(position < list->_private.length, IndexOutOfBoundException, "position=", position, "array.length=", list->_private.length);
-	}
+	check(position < list->_private.length, IndexOutOfBoundException, "position=", position, "array.length=", list->_private.length);
 	unsigned long pointer = (unsigned long)list->_private.elements;
 	pointer += position*list->_private.element_size;
 	memcpy((void*)pointer, element, list->_private.element_size);
 }
 
 void * FixedSizeList__get(FixedSizeList *list, unsigned int position) {
-	if(position >= list->_private.length) {
-		check(position < list->_private.length, IndexOutOfBoundException, "position=", position, "array.length=", list->_private.length);
-	}
+	check(position < list->_private.length, IndexOutOfBoundException, "position=", position, "array.length=", list->_private.length);
 	unsigned long pointer = (unsigned long)list->_private.elements;
 	pointer += position*list->_private.element_size;
 	return (void*)pointer;
