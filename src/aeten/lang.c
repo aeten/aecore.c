@@ -2,23 +2,43 @@
 #include "aeten/lang/Throwable.h"
 #include "aeten/lang.h"
 
-/* TODO: Use a Map when will be implemented */
-aeten_lang__List* _aeten_lang__interfaces = NULL;
+#ifdef AETEN_DEBUG
+#	include<stdio.h>
+#	include <assert.h>
+#	undef AETEN_DEBUG
+#	define AETEN_DEBUG(format, ...) do { \
+		static char* _aeten_debug_tmp_str = 0; \
+		fprintf(stderr, "%s +%d: " format "\n", __FILE__, __LINE__, __VA_ARGS__); \
+		if (_aeten_debug_tmp_str) { \
+			free(_aeten_debug_tmp_str); \
+			_aeten_debug_tmp_str = 0; \
+		} \
+	} while (0)
+#	define AETEN_DEBUG_JOIN_STRINGS(src, join) _aeten_lang__join_strings(_aeten_debug_tmp_str, src, join)
+#	define AETEN_DEBUG_ASSERT(...) assert(__VA_ARGS__)
 
+#else
+#	define AETEN_DEBUG(...)
+#	define AETEN_DEBUG_JOIN_STRINGS(dest, src)
+#	define AETEN_DEBUG_ASSERT(...)
+#endif
+
+/* TODO: Use a Map when will be implemented */
+static List* _interfaces_list = NULL;
 
 void _aeten_lang__init(void) {
-	if (!_aeten_lang__interfaces) {
-		aeten_lang__ArrayList* list = calloc(1, sizeof(aeten_lang__ArrayList));
-		_aeten_lang__ArrayList__init(list, sizeof(aeten_lang__interface_t), 20);
-		_aeten_lang__interfaces = list->_as__aeten_lang__List;
+	if (!_interfaces_list) {
+		ArrayList* list = calloc(1, sizeof(ArrayList));
+		_ArrayList__init(list, sizeof(aeten_lang__interface_t), 20);
+		_interfaces_list = list->_as__List;
 	}
 }
 
 aeten_lang__interface_t* aeten_lang__get_interface(const char* iface_name) {
 	unsigned int i;
-	size_t size = _aeten_lang__interfaces->size(_aeten_lang__interfaces);
+	size_t size = _interfaces_list->size(_interfaces_list);
 	for (i=0; i < size; ++i) {
-		aeten_lang__interface_t* iface = _aeten_lang__interfaces->get(_aeten_lang__interfaces, i);
+		aeten_lang__interface_t* iface = _interfaces_list->get(_interfaces_list, i);
 		if (0 == strcmp(iface->name, iface_name)) {
 			return iface;
 		}
@@ -36,14 +56,13 @@ void _aeten_lang__construct(char const *iface_name, aeten_lang__interface_t *ifc
 	for (size=0; ifc_list[size] ; ++size) { }
 	iface.name = iface_name;
 	AETEN_DEBUG("Register %s(%lx)", iface.name, (unsigned long int)&iface);
-	iface.parents = (aeten_lang__ParentsList*)aeten_lang__ArrayList__new(sizeof(aeten_lang__interface_t), size);
+	iface.parents = (aeten_lang__ParentsList*)ArrayList__new(sizeof(aeten_lang__interface_t), size);
 	for (i=0; i < size && ifc_list[i]; ++i) {
 		AETEN_DEBUG("\t%s(%lx) inherits from %s(%lx)", iface.name, (unsigned long int)&iface, ifc_list[i]->name, (unsigned long int)ifc_list[i]);
-		((aeten_lang__List*)iface.parents)->add((aeten_lang__List*)iface.parents, ifc_list[i]);
+		((List*)iface.parents)->add(iface.parents, ifc_list[i]);
 	}
-	aeten_lang__List* list = aeten_lang__ArrayList__new(sizeof(aeten_lang__method_definition_t), 0);
-	iface.methods = (aeten_lang__MethodsList*)list;
-	_aeten_lang__interfaces->add(_aeten_lang__interfaces, &iface);
+	iface.methods = (aeten_lang__MethodsList*)ArrayList__new(sizeof(aeten_lang__method_definition_t), 0);
+	_interfaces_list->add(_interfaces_list, &iface);
 }
 
 char *_aeten_lang__join_strings(char *dest, char* src[], char join) {
@@ -77,11 +96,15 @@ void _aeten_lang__method_construct(char const *iface_name, char const *name, cha
 	aeten_lang__method_definition_t method = {
 		iface,
 		name,
-		(aeten_lang__Signature*) aeten_lang__ArrayList__new(sizeof(aeten_lang__type_t), size)
+		(aeten_lang__Signature*) ArrayList__new(sizeof(aeten_lang__type_t), size)
 	};
 	for (i=0; i<size; ++i) {
 		aeten_lang__type_t type = { signature_types[i], signature_sizes[i] };
-		((aeten_lang__List*)method.signature)->add((aeten_lang__List*)method.signature, &type);
+		((List*)method.signature)->add(method.signature, &type);
 	}
-	((aeten_lang__List*)iface->methods)->add((aeten_lang__List*)iface->methods, (void*)&method);
+	((List*)iface->methods)->add(iface->methods, (void*)&method);
+}
+
+aeten_lang__interface_t* aeten_lang__interface_of(void* instance) {
+	return aeten_lang__get_interface((*(aeten_lang__implementation_t**)instance)->interface);
 }

@@ -18,7 +18,6 @@
 #include "aeten/lang/FOR_EACH.h"
 
 typedef struct aeten_lang__interface_st             aeten_lang__interface_t;
-typedef struct aeten_lang__class_st                 aeten_lang__class_t;
 typedef struct aeten_lang__method_definition_st     aeten_lang__method_definition_t;
 typedef struct aeten_lang__method_implementation_st aeten_lang__method_implementation_t;
 typedef struct aeten_lang__type_st                  aeten_lang__type_t;
@@ -76,7 +75,6 @@ struct aeten_lang__ParentsList_st {
 	aeten_lang__interface_t*  (*get) (aeten_lang__ParentsList*, unsigned int);
 };
 
-
 struct aeten_lang__method_definition_st {
 	aeten_lang__interface_t const *interface;
 	char const * name;
@@ -92,52 +90,22 @@ void _aeten_lang__construct(char const *iface, aeten_lang__interface_t *ifc_list
 char *_aeten_lang__join_strings(char *dest, char* src[], char join);
 void _aeten_lang__method_construct(char const *iface, char const *name, char *signature_types[], size_t signature_sizes[]);
 aeten_lang__interface_t* aeten_lang__get_interface(const char* iface_name);
+aeten_lang__interface_t* aeten_lang__interface_of(void* instance);
 
-
-#define AETEN_COUNT_OF(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
-
-#ifdef AETEN_DEBUG
-#	include<stdio.h>
-#	include <assert.h>
-#	undef AETEN_DEBUG
-#	define AETEN_DEBUG(format, ...) do { \
-		static char* _aeten_debug_tmp_str = 0; \
-		fprintf(stderr, "%s +%d: " format "\n", __FILE__, __LINE__, __VA_ARGS__); \
-		if (_aeten_debug_tmp_str) { \
-			free(_aeten_debug_tmp_str); \
-			_aeten_debug_tmp_str = 0; \
-		} \
-	} while (0)
-#	define AETEN_DEBUG_JOIN_STRINGS(src, join) _aeten_lang__join_strings(_aeten_debug_tmp_str, src, join)
-#	define AETEN_DEBUG_ASSERT(...) assert(__VA_ARGS__)
-
-#else
-#	define AETEN_DEBUG(...)
-#	define AETEN_DEBUG_JOIN_STRINGS(dest, src)
-#	define AETEN_DEBUG_ASSERT(...)
-#endif
-
-#define aeten_lang__type_of(a) \
-	((aeten_lang__type_t) { #a, sizeof(a) })
-
-#define aeten_lang__delete(object) do { \
+#define delete(object) do { \
 		object->_implementation->finalize((aeten_lang__interface_t*)object); \
 		free(object->_implementation); \
 	} while(0)
 
 
-#define aeten_lang__call(object_ref, method, ...) \
+#define call(object_ref, method, ...) \
 	object_ref->method(object_ref, ##__VA_ARGS__)
 
-#define aeten_lang__cnc aeten_lang__cast_and_call
-#define aeten_lang__cast_and_call(object_ref, type, method, ...) ({ \
-	type * ref = aeten_lang__cast_ref(type, object_ref); \
-	ref->method(ref, ##__VA_ARGS__); \
-})
+#define cast(type, object_ref) (object_ref->_as__##type)
 
 
-// TODO: check instance interfaces before
-#define aeten_lang__cast_ref(type, object_ref) (object_ref->_as__##type)
+#define aeten_lang__type_of(a) \
+	((aeten_lang__type_t) { #a, sizeof(a) })
 
 
 #define _AETEN_REF_OF_EACH_IFACE(iface) aeten_lang__get_interface(#iface),

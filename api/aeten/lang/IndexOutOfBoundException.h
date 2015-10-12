@@ -2,7 +2,7 @@
 #define _AETEN_LANG_OOBEXCEPTION_H
 
 #define AETEN_LANG_IMPLEMENTATION_H \
-	aeten_lang__implementation(aeten_lang__IndexOutOfBoundException, aeten_lang__Throwable)
+	aeten_lang__implementation(IndexOutOfBoundException, Throwable)
 
 #define AETEN_LANG_PRIVATE \
 	aeten_lang__private(char* message)

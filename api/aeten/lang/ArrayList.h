@@ -5,7 +5,7 @@
 #include <stddef.h>
 
 #define AETEN_LANG_IMPLEMENTATION_H \
-	aeten_lang__implementation(aeten_lang__ArrayList, aeten_lang__List)
+	aeten_lang__implementation(ArrayList, List)
 
 #define AETEN_LANG_PRIVATE \
 	aeten_lang__private(size_t capacity, size_t size, size_t element_size, void *elements)

@@ -41,8 +41,6 @@ export_typedef() {
 	sed -n 's@//.*@@
       s@/\*.*\*/@@g
 		s/^\s*typedef\s\s*\(struct\s\+\)\?[A-Za-z][a-zA-Z0-9_]*\s\s*'${PACKAGE_NAME}'__\([A-Za-z][a-zA-Z0-9_]*\).*$/#\t\tdefine \2'"${SPACE}${PACKAGE_NAME}"'__\2/p' ${INPUT_FILE};
-	# TODO
-	#typedef rettype (*${PACKAGE_NAME}__\1) (.*);
 }
 
 export_macros() {
@@ -65,9 +63,6 @@ export_implementation() {
 	sed -n 's@//.*@@
 		s@/\*.*\*/@@g
 		s/^\s*\(aeten_lang__\)\?implementation\s*(\s*\('${PACKAGE_NAME}'__\([A-Z][a-zA-Z0-9_]*\)\).*$/#\t\tdefine \3'"${SPACE}"'\2/p' ${INPUT_FILE}|sort -u
-	sed -n 's@//.*@@
-		s@/\*.*\*/@@g
-		s/^\s*[a-zA-Z][a-zA-Z0-9_]*\s*\**\s*\('${PACKAGE_NAME}'__\([A-Z][a-zA-Z0-9_]*\)\).*$/#\t\tdefine \2'"${SPACE}"'\1/p' ${INPUT_FILE}|sort -u
 }
 
 

@@ -2,7 +2,7 @@
 
 #include "aeten/lang/start-interface.h"
 #define AETEN_LANG_INTERFACE \
-	aeten_lang__interface(aeten_lang__List, aeten_lang__Iterable)
+	aeten_lang__interface(List, Iterable)
 
 #define AETEN_LANG_METHODS \
 	/** Returns the number of elements in this list. */ \
@@ -18,7 +18,6 @@
 	aeten_lang__method(void, add, void* /* element */);
 
 #ifndef _AETEN_LANG_LIST_H
-#define _AETEN_LANG_LIST_H
-#include "aeten/lang/end-interface.h"
-
+	#define _AETEN_LANG_LIST_H
+	#include "aeten/lang/end-interface.h"
 #endif

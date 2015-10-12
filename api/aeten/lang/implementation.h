@@ -97,7 +97,7 @@
 		AETEN_LANG_CONSTRUCTORS
 	#endif
 
-	#define aeten_lang__constructor_cast(iface, instance) aeten_lang__cast_ref(iface, instance)
+	#define aeten_lang__constructor_cast(iface, instance) cast(iface, instance)
 	#undef  aeten_lang__constructor
 	#ifdef AETEN_LANG_IMPLEMENTATION_C
 		#define aeten_lang__constructor(...) \

@@ -1,12 +1,11 @@
 #ifndef _AETEN_LANG_COW_H
 #define _AETEN_LANG_COW_H
-//#include "aeten/lang/List.h"
 
 /**
  * Thread safe copy on write List implementation.
  */
 #define AETEN_LANG_IMPLEMENTATION_H \
-	aeten_lang__implementation(aeten_lang__CopyOnWriteArrayList, aeten_lang__List)
+	aeten_lang__implementation(CopyOnWriteArrayList, List)
 
 #define AETEN_LANG_PRIVATE \
 	aeten_lang__private(aeten_lang__array_t* volatile array)
