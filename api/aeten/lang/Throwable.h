@@ -24,7 +24,8 @@ typedef struct _aeten_lang__handles_exception_st {
 
 Throwable* Throwable__get_thrown(void);
 void Throwable__handle(aeten_lang__handled_exception_t* handled_exception);
-void Throwable__throw(Throwable*);
+void Throwable__throw(Throwable* exception);
+void Throwable__set_finally(aeten_lang__finally_t finally_block);
 void Throwable__reset(void);
 
 
@@ -39,9 +40,9 @@ void Throwable__reset(void);
 	int _catched_ = 0; \
 	aeten_lang__try_t _try_block_; \
 	aeten_lang__catch_t _catch_block_; \
+	Throwable__reset(); \
 	List* _handled_exceptions_ = ArrayList__new(sizeof(aeten_lang__handled_exception_t), 1); \
 	aeten_lang__handled_exception_t* _handled_exception_ref_ = NULL; \
-	Throwable__reset(); \
 	Closable* _try_resources_[] = { __VA_ARGS__ } ; \
 	size_t _try_resources_size_ = AETEN_FOR_EACH_NARG(__VA_ARGS__); \
 	void _finally_block_ (void) { \
@@ -52,7 +53,7 @@ void Throwable__reset(void);
 			Throwable* _error_ = Throwable__get_thrown(); \
 			_error_->print_message(_error_); \
 			raise(SIGABRT); \
-		} ;\
+		} \
 		Throwable__reset(); \
 	} \
 	{ \
@@ -83,6 +84,7 @@ void Throwable__reset(void);
 #define finally(finally_block) \
 			_aeten_lang__block_; \
 		}); \
+		Throwable__set_finally(({void _goto_finally_(void) {finally_block;goto _finally_;} _goto_finally_;})); \
 		_handled_exception_ref_->catch_block = (aeten_lang__catch_t)({ \
 			void _aeten_lang__block_ (Throwable* exception) { \
 				_catch_block_(exception); \
@@ -93,7 +95,6 @@ void Throwable__reset(void);
 	} \
 	_try_block_(); \
 	_finally_: _finally_block_(); \
-	finally_block; \
 }
 
 

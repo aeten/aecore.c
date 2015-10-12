@@ -65,9 +65,9 @@ int main(int argc, char **argv) {
 		}
 	} catch(IndexOutOfBoundException, exception) {
 		exception->print_message(exception);
-	} finally() {
+	} finally(
 		printf("Finally\n");
-	}
+	)
 	delete(list);
 	return 0;
 }

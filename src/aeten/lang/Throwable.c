@@ -4,13 +4,18 @@
 /* TODO: Use a Stack when will be implemented */
 __thread Throwable* _aeten_lang__thrown_exception = NULL;
 __thread List* _aeten_lang__handled_exceptions = NULL;
+__thread aeten_lang__finally_t _aeten_lang__finally = NULL;
 
 Throwable* Throwable__get_thrown(void) {
 	return _aeten_lang__thrown_exception;
 }
 
 void Throwable__handle(aeten_lang__handled_exception_t* handled_exception) {
-	_aeten_lang__handled_exceptions->add(_aeten_lang__handled_exceptions, &handled_exception); \
+	_aeten_lang__handled_exceptions->add(_aeten_lang__handled_exceptions, &handled_exception);
+}
+
+void  Throwable__set_finally(aeten_lang__finally_t finally_block) {
+	_aeten_lang__finally = finally_block;
 }
 
 void Throwable__throw(Throwable* exception) {
@@ -22,9 +27,11 @@ void Throwable__throw(Throwable* exception) {
 			handled_exception->catch_block(exception);
 		}
 	}
+	_aeten_lang__finally();
 }
 
 void  Throwable__reset(void) {
+	_aeten_lang__finally = NULL;
 	_aeten_lang__thrown_exception = NULL;
 	if (_aeten_lang__handled_exceptions != NULL) {
 		delete(_aeten_lang__handled_exceptions);
