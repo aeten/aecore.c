@@ -5,7 +5,7 @@
 
 #include "aeten/lang/ArrayList.h"
 
-void ArrayList__initialize(ArrayList *list, size_t element_size, size_t initial_capacity) {
+inline void ArrayList__initialize(ArrayList *list, size_t element_size, size_t initial_capacity) {
 	list->_private.element_size = element_size;
 	if (initial_capacity>0) {
 		list->_private.elements = calloc(initial_capacity, element_size);
@@ -14,21 +14,21 @@ void ArrayList__initialize(ArrayList *list, size_t element_size, size_t initial_
 	list->_private.size = 0;
 }
 
-void ArrayList__finalize(ArrayList *list) {
+inline void ArrayList__finalize(ArrayList *list) {
 	if (list && list->_private.elements) {
 		free(list->_private.elements);
 		list->_private.elements = NULL;
 	}
 }
 
-void ArrayList__set(ArrayList *list, unsigned int position, void *element) {
+inline void ArrayList__set(ArrayList *list, unsigned int position, void *element) {
 	check(position < list->_private.size, IndexOutOfBoundException, "position=%u; array.length=%u", position, list->_private.size);
 	unsigned long pointer = (unsigned long)list->_private.elements;
 	pointer += position*list->_private.element_size;
 	memcpy((void*)pointer, element, list->_private.element_size);
 }
 
-void ArrayList__add(ArrayList *list, void *element) {
+inline void ArrayList__add(ArrayList *list, void *element) {
 	if (list->_private.capacity == list->_private.size) {
 		unsigned int capacity = ((list->_private.capacity * 3) / 2) + 1;
 		void* elements = calloc(capacity, list->_private.element_size);
@@ -41,14 +41,14 @@ void ArrayList__add(ArrayList *list, void *element) {
 	list->_private.size++;
 }
 
-void* ArrayList__get(ArrayList *list, unsigned int position) {
+inline void* ArrayList__get(ArrayList *list, unsigned int position) {
 	check(position < list->_private.size, IndexOutOfBoundException, "position=%u; array.length=%u", position, list->_private.size);
 	unsigned long pointer = (unsigned long)list->_private.elements;
 	pointer += position*list->_private.element_size;
 	return (void*)pointer;
 }
 
-size_t ArrayList__size(ArrayList *list) {
+inline size_t ArrayList__size(ArrayList *list) {
 	return list->_private.size;
 }
 
