@@ -16,7 +16,6 @@ HDR=$(shell find api -type f -name \*.h) ${GEN}
 SRC=$(shell find src -type f -name \*.c)
 
 GEN=$(shell ./generator/export -l) $(shell ./generator/for-each-macro -l)
-HDR_O=$(addprefix ${BUILD}/,$(patsubst %.h,%.h.o,${HDR}))
 SRC_O=$(addprefix ${BUILD}/,$(patsubst %.c,%.o,${SRC}))
 
 
@@ -45,7 +44,7 @@ ${GEN}:
 	./generator/export
 	./generator/for-each-macro
 
-${SRC_O}: ${HDR_O}
+${SRC_O}:
 
 ${BUILD}/%.h.o: %.h generator
 	@-mkdir --parent $$(dirname $@)

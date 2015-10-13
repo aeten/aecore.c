@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <assert.h>
-#include "aeten/lang/ArrayList.h"
 #include "aeten/lang/CopyOnWriteArrayList.h"
 #include "aeten/lang/Throwable.h"
 #include "aeten/lang/IndexOutOfBoundException.h"
 
+#define AETEN_LANG_PARAMETRIZED_TYPE IntList
+#define T unsigned int*
+#include "aeten/lang/List.h"
 
 void print_methods(aeten_lang__interface_t* interface, unsigned int level);
 void print_parents(aeten_lang__interface_t* interface, unsigned int level);
@@ -45,7 +47,7 @@ void print_parents(aeten_lang__interface_t* interface, unsigned int level) {
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 int main(int argc, char **argv) {
 	unsigned int i, value;
-	List* list = CopyOnWriteArrayList__new(sizeof(int));
+	IntList* list = (IntList*)CopyOnWriteArrayList__new(sizeof(int));
 	print_parents(aeten_lang__interface_of(list), 0);
 
 	/* check cast */
@@ -54,13 +56,13 @@ int main(int argc, char **argv) {
 	assert(iterator==NULL);
 
 	for (i=0; i<10; ++i) {
-		list->add(list, (void*)&i);
+		list->add(list, &i);
 	}
 
 	try() {
 		size_t size = list->size(list);
 		for (i=0; i<size; ++i) {
-			value = *(int*)list->get(list, i+8);
+			value = *list->get(list, i+8);
 			printf("Value of list[%d]=%d\n", i+8, value);
 		}
 	} catch(IndexOutOfBoundException, exception) {

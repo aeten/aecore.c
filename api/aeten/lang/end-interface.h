@@ -4,11 +4,35 @@
 #define aeten_lang__interface(iface, ...) iface
 #undef aeten_lang__implementation
 #define aeten_lang__implementation(impl, iface) iface
-#if defined(AETEN_LANG_INTERFACE)
-	#define AETEN_LANG_IFACE(prefix, suffix) AETEN_LANG_IFACE_1(prefix, AETEN_LANG_INTERFACE, suffix)
-	#define AETEN_LANG_IFACE_1(prefix, iface, suffix) AETEN_LANG_IFACE_2(prefix, iface, suffix)
-	#define AETEN_LANG_IFACE_2(prefix, iface, suffix) prefix##iface##suffix
+#define AETEN_LANG_IFACE(prefix, suffix) AETEN_LANG_IFACE_1(prefix, AETEN_LANG_INTERFACE, suffix)
+#define AETEN_LANG_IFACE_1(prefix, iface, suffix) AETEN_LANG_IFACE_2(prefix, iface, suffix)
+#define AETEN_LANG_IFACE_2(prefix, iface, suffix) prefix##iface##suffix
 
+#ifndef AETEN_LANG_INTERFACE
+	#error AETEN_LANG_INTERFACE must be defined
+#endif
+
+#ifdef AETEN_LANG_PARAMETRIZED_TYPE
+	typedef struct {
+		aeten_lang__implementation_t* _implementation;
+		#define aeten_lang__method(type, name, ...) \
+			type (*name)(void*, ##__VA_ARGS__);
+		AETEN_LANG_METHODS
+		#undef aeten_lang__method
+		#undef aeten_lang__interface
+		#define aeten_lang__interface(iface, ...) __VA_ARGS__
+		#undef _aeten_lang__as_inherit
+		#define _aeten_lang__as_inherit(iface) \
+			iface*                        _as__##iface; \
+			aeten_lang__implementation_t* _##iface##__impl; \
+			struct                        _##iface##_st;
+		AETEN_FOR_EACH(_aeten_lang__as_inherit, AETEN_LANG_INTERFACE)
+		#undef aeten_lang__interface
+		#define aeten_lang__interface(iface, ...) iface
+	} AETEN_LANG_PARAMETRIZED_TYPE;
+	#undef AETEN_LANG_PARAMETRIZED_TYPE
+
+#else
 	#undef aeten_lang__interface
 	#define aeten_lang__interface(iface, ...) iface
 
