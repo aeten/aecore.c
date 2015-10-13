@@ -1,4 +1,5 @@
 #include <signal.h>
+
 #define AETEN_LANG_REQUIRE
 #include "aeten/lang/Closable.h"
 
@@ -23,7 +24,7 @@ typedef struct _aeten_lang__handles_exception_st {
 } aeten_lang__handled_exception_t;
 
 Throwable* Throwable__get_thrown(void);
-void Throwable__handle(aeten_lang__handled_exception_t* handled_exception);
+aeten_lang__handled_exception_t* Throwable__handle(void);
 void Throwable__throw(Throwable* exception);
 void Throwable__set_finally(aeten_lang__finally_t finally_block);
 void Throwable__reset(void);
@@ -35,14 +36,12 @@ void Throwable__reset(void);
  */
 #define try(...) { \
 	__label__ _finally_;\
-	unsigned int _handled_exception_index_ = 0; \
 	unsigned int _try_resource_; \
 	int _catched_ = 0; \
 	aeten_lang__try_t _try_block_; \
 	aeten_lang__catch_t _catch_block_; \
 	Throwable__reset(); \
-	List* _handled_exceptions_ = ArrayList__new(sizeof(aeten_lang__handled_exception_t), 1); \
-	aeten_lang__handled_exception_t* _handled_exception_ref_ = NULL; \
+	aeten_lang__handled_exception_t* _handled_exception_ = NULL; \
 	Closable* _try_resources_[] = { __VA_ARGS__ } ; \
 	size_t _try_resources_size_ = AETEN_FOR_EACH_NARG(__VA_ARGS__); \
 	void _finally_block_ (void) { \
@@ -62,8 +61,8 @@ void Throwable__reset(void);
 #define catch(exception_interface, _exception_) \
 			_aeten_lang__block_; \
 		}); \
-		if (_handled_exception_ref_) { \
-			_handled_exception_ref_->catch_block = (aeten_lang__catch_t)({ \
+		if (_handled_exception_) { \
+			_handled_exception_->catch_block = (aeten_lang__catch_t)({ \
 				void _aeten_lang__block_ (Throwable* exception) { \
 					_catch_block_(exception); \
 					_catched_ = 1; \
@@ -73,11 +72,8 @@ void Throwable__reset(void);
 		} \
 	} \
 	{ \
-		aeten_lang__handled_exception_t _handled_exception_; \
-		_handled_exceptions_->add(_handled_exceptions_, &_handled_exception_); \
-		_handled_exception_ref_ = _handled_exceptions_->get(_handled_exceptions_, _handled_exception_index_++); \
-		Throwable__handle(_handled_exception_ref_); \
-		_handled_exception_ref_->exception = #exception_interface; \
+		_handled_exception_ = Throwable__handle(); \
+		_handled_exception_->exception = #exception_interface; \
 		_catch_block_ =  (aeten_lang__catch_t)({ \
 			void _aeten_lang__block_ (Throwable* exception) \
 
@@ -85,7 +81,7 @@ void Throwable__reset(void);
 			_aeten_lang__block_; \
 		}); \
 		Throwable__set_finally(({void _goto_finally_(void) {finally_block;goto _finally_;} _goto_finally_;})); \
-		_handled_exception_ref_->catch_block = (aeten_lang__catch_t)({ \
+		_handled_exception_->catch_block = (aeten_lang__catch_t)({ \
 			void _aeten_lang__block_ (Throwable* exception) { \
 				_catch_block_(exception); \
 				_catched_ = 1; \

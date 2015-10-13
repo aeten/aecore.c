@@ -10,8 +10,10 @@ Throwable* Throwable__get_thrown(void) {
 	return _aeten_lang__thrown_exception;
 }
 
-void Throwable__handle(aeten_lang__handled_exception_t* handled_exception) {
+aeten_lang__handled_exception_t* Throwable__handle(void) {
+	aeten_lang__handled_exception_t* handled_exception = malloc(sizeof(aeten_lang__handled_exception_t));
 	_aeten_lang__handled_exceptions->add(_aeten_lang__handled_exceptions, &handled_exception);
+	return handled_exception;
 }
 
 void  Throwable__set_finally(aeten_lang__finally_t finally_block) {
@@ -31,9 +33,14 @@ void Throwable__throw(Throwable* exception) {
 }
 
 void  Throwable__reset(void) {
+	unsigned int i;
 	_aeten_lang__finally = NULL;
 	_aeten_lang__thrown_exception = NULL;
 	if (_aeten_lang__handled_exceptions != NULL) {
+		for (i=0; i<_aeten_lang__handled_exceptions->size(_aeten_lang__handled_exceptions); ++i) {
+			aeten_lang__handled_exception_t* handled_exception = *(aeten_lang__handled_exception_t**)_aeten_lang__handled_exceptions->get(_aeten_lang__handled_exceptions, i);
+			free(handled_exception);
+		}
 		delete(_aeten_lang__handled_exceptions);
 	}
 	_aeten_lang__handled_exceptions = ArrayList__new(sizeof(aeten_lang__handled_exception_t*), 1);
