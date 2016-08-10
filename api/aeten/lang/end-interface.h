@@ -1,5 +1,9 @@
 #include "aeten/lang.h"
 
+#ifndef AETEN_LANG_INTERFACE
+    #error AETEN_LANG_INTERFACE must be defined
+#endif
+
 #undef aeten_lang__interface
 #define aeten_lang__interface(iface, ...) iface
 #undef aeten_lang__implementation
@@ -7,10 +11,6 @@
 #define AETEN_LANG_IFACE(prefix, suffix) AETEN_LANG_IFACE_1(prefix, AETEN_LANG_INTERFACE, suffix)
 #define AETEN_LANG_IFACE_1(prefix, iface, suffix) AETEN_LANG_IFACE_2(prefix, iface, suffix)
 #define AETEN_LANG_IFACE_2(prefix, iface, suffix) prefix##iface##suffix
-
-#ifndef AETEN_LANG_INTERFACE
-	#error AETEN_LANG_INTERFACE must be defined
-#endif
 
 #ifdef AETEN_LANG_PARAMETRIZED_TYPE
 	typedef struct {
