@@ -101,8 +101,8 @@ void Throwable__reset(void);
 			char* message = aeten_lang__string_from_format(message_format, ##__VA_ARGS__); \
 			char* prefixed_message = aeten_lang__string_from_format("%s +%u: Check (%s): %s (%s)", __func__, __LINE__, #expression, #exception, message); \
 			Throwable__throw(exception##__new(prefixed_message)); \
-			free(message); \
-			free(prefixed_message); \
+			free(message); /* TODO: move it into finally block */ \
+			free(prefixed_message); /* TODO: move it into finally block */ \
 		} \
 	} while (0);
 
