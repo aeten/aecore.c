@@ -8,6 +8,8 @@ OPTIMITATION=0
 
 CCFLAGS=-g -O${OPTIMITATION} -fPIC -std=${STANDARD} -fplan9-extensions $(addprefix -W,${CCWARNING})
 
+LDFLAGS=-lpthread
+
 NAME=$(notdir $(realpath $(dir $MAKEFILE)))
 VERSION=$(shell { git describe --tags --match='[0-9]*\.[0-9]*' --dirty=+ 2>/dev/null || echo g$$(git describe --always --dirty=+); } | sed 's@.*/@@')
 
@@ -56,7 +58,7 @@ ${BUILD}/%.o: %.c ${HDR}
 
 ${LIB}: ${SRC_O}
 	@-mkdir --parent $$(dirname $@)
-	${CC} -shared -o $@ ${CCFLAGS}  -Iapi -I${GENERATED}/api $^
+	${CC} -shared -o $@ ${LDFLAGS} ${CCFLAGS}  -Iapi -I${GENERATED}/api $^
 	@chmod -x $@
 
 ${BUILD}/test/lang: test/aelang.c ${LIB}
